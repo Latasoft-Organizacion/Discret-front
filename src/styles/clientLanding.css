@@ -1,0 +1,475 @@
+/* ========================================
+   PAGINA PRINCIPAL LANDING CLIENTE
+======================================== */
+
+.client-landing-page {
+  min-height: 100vh;
+
+  background-image:
+    linear-gradient(
+      90deg,
+      rgba(5, 8, 15, 0.15),
+      rgba(5, 8, 15, 0.92)
+    ),
+    url('/motel-reservas-front/src/assets/images/motel-registro.png');
+
+  background-size: cover;
+  background-position: center left;
+  background-repeat: no-repeat;
+
+  color: #ffffff;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+
+  overflow: hidden;
+  position: relative;
+}
+
+
+/* ========================================
+   OVERLAY OSCURO + CONTENIDO
+======================================== */
+
+.client-landing-overlay {
+  min-height: 100vh;
+
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+
+  padding: 40px 90px;
+
+  background:
+    radial-gradient(
+      circle at right,
+      rgba(236, 72, 153, 0.18),
+      transparent 38%
+    );
+}
+
+
+/* ========================================
+   NAVBAR SUPERIOR
+======================================== */
+
+.client-navbar {
+  position: absolute;
+
+  top: 28px;
+  left: 0;
+
+  width: 100%;
+
+  padding: 0 70px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  z-index: 10;
+}
+
+.client-navbar-logo {
+  font-size: 28px;
+  font-weight: 300;
+
+  letter-spacing: 8px;
+
+  color: #ff4fa3;
+
+  text-shadow:
+    0 0 8px rgba(236, 72, 153, 0.8),
+    0 0 18px rgba(236, 72, 153, 0.5);
+}
+
+.client-admin-btn {
+  height: 48px;
+
+  padding: 0 20px;
+
+  border-radius: 12px;
+
+  border: 1px solid rgba(236, 72, 153, 0.35);
+
+  background: rgba(15, 23, 42, 0.72);
+
+  color: #ffffff;
+
+  cursor: pointer;
+
+  font-weight: 700;
+
+  backdrop-filter: blur(12px);
+
+  transition: 0.2s ease;
+}
+
+.client-admin-btn:hover {
+  background: rgba(236, 72, 153, 0.18);
+
+  transform: translateY(-2px);
+}
+
+
+/* ========================================
+   CONTENIDO PRINCIPAL
+======================================== */
+
+.client-landing-content {
+  width: 100%;
+  max-width: 560px;
+
+  text-align: center;
+
+  animation: clientFadeUp 0.5s ease;
+}
+
+
+/* ========================================
+   LOGO
+======================================== */
+
+.client-logo-box {
+  margin-bottom: 32px;
+}
+
+.client-icon {
+  width: 92px;
+  height: 92px;
+  margin: 0 auto 24px;
+  border: 2px solid #ec4899;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ff4fa3;
+  box-shadow:
+    0 0 20px rgba(236, 72, 153, 0.55),
+    0 0 45px rgba(236, 72, 153, 0.22);
+}
+
+.client-logo-box h1 {
+  margin: 0;
+
+  font-size: 74px;
+  font-weight: 300;
+
+  letter-spacing: 16px;
+
+  color: #ff4fa3;
+
+  animation: neonPulse 3s infinite alternate;
+
+  text-shadow:
+    0 0 8px rgba(236, 72, 153, 0.9),
+    0 0 22px rgba(236, 72, 153, 0.65);
+}
+
+.client-logo-box p {
+  margin-top: 10px;
+
+  color: #e5e7eb;
+
+  letter-spacing: 8px;
+
+  font-size: 15px;
+}
+
+
+/* ========================================
+   DIVISOR
+======================================== */
+
+.client-divider {
+  display: flex;
+  align-items: center;
+
+  gap: 18px;
+
+  margin: 28px 0;
+}
+
+.client-divider span {
+  flex: 1;
+
+  height: 1px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      #ec4899,
+      transparent
+    );
+}
+
+.client-divider strong {
+  color: #ff4fa3;
+
+  font-size: 38px;
+
+  text-shadow:
+    0 0 18px rgba(236, 72, 153, 0.8);
+}
+
+
+/* ========================================
+   TITULOS
+======================================== */
+
+.client-landing-content h2 {
+  font-size: 46px;
+
+  margin-bottom: 12px;
+}
+
+.client-subtitle {
+  color: #cbd5e1;
+
+  font-size: 22px;
+
+  margin-bottom: 32px;
+}
+
+
+/* ========================================
+   BENEFICIOS
+======================================== */
+
+.client-benefits {
+  list-style: none;
+
+  padding: 0;
+
+  margin: 0 auto 36px;
+
+  display: grid;
+  gap: 18px;
+
+  max-width: 360px;
+
+  text-align: left;
+}
+
+.client-benefits li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  color: #dbeafe;
+  font-size: 18px;
+}
+
+.client-benefits li svg {
+  min-width: 20px;
+  min-height: 20px;
+
+  color: #ff4fa3;
+}
+
+.client-reserve-btn {
+  width: 100%;
+  max-width: 520px;
+  height: 76px;
+
+  border: none;
+  border-radius: 16px;
+
+  background: linear-gradient(135deg, #ec4899, #db2777);
+
+  color: #ffffff;
+
+  font-size: 24px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  box-shadow: 0 18px 45px rgba(236, 72, 153, 0.45);
+
+  transition: 0.25s ease;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.client-reserve-btn svg {
+  min-width: 22px;
+  min-height: 22px;
+}
+
+
+/* ========================================
+   BOTON RESERVAR
+======================================== */
+
+.client-reserve-btn {
+  width: 100%;
+  max-width: 520px;
+
+  height: 76px;
+
+  border: none;
+  border-radius: 16px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ec4899,
+      #db2777
+    );
+
+  color: #ffffff;
+
+  font-size: 24px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 18px 45px rgba(236, 72, 153, 0.45);
+
+  transition: 0.25s ease;
+}
+
+.client-reserve-btn:hover {
+  transform: translateY(-3px);
+
+  filter: brightness(1.08);
+}
+
+
+/* ========================================
+   PRIVACIDAD
+======================================== */
+
+.client-privacy-box {
+  margin-top: 28px;
+
+  padding: 22px;
+
+  border-radius: 18px;
+
+  background: rgba(15, 23, 42, 0.68);
+
+  border: 1px solid rgba(236, 72, 153, 0.14);
+
+  backdrop-filter: blur(12px);
+}
+
+.client-privacy-box strong {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: #ff4fa3;
+
+  font-size: 20px;
+}
+
+.client-privacy-box p {
+  color: #cbd5e1;
+
+  line-height: 1.6;
+}
+
+
+/* ========================================
+   FOOTER
+======================================== */
+
+.client-landing-content small {
+  display: block;
+
+  margin-top: 34px;
+
+  color: #94a3b8;
+}
+
+
+/* ========================================
+   ANIMACIONES
+======================================== */
+
+@keyframes clientFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes neonPulse {
+  from {
+    text-shadow:
+      0 0 8px rgba(236, 72, 153, 0.9),
+      0 0 22px rgba(236, 72, 153, 0.55);
+  }
+
+  to {
+    text-shadow:
+      0 0 14px rgba(236, 72, 153, 1),
+      0 0 34px rgba(236, 72, 153, 0.9),
+      0 0 60px rgba(236, 72, 153, 0.5);
+  }
+}
+
+
+/* ========================================
+   RESPONSIVE
+======================================== */
+
+@media (max-width: 900px) {
+
+  .client-landing-overlay {
+    justify-content: center;
+
+    padding: 32px 22px;
+
+    background: rgba(5, 8, 15, 0.78);
+  }
+
+  .client-navbar {
+    padding: 0 20px;
+
+    top: 20px;
+  }
+
+  .client-navbar-logo {
+    font-size: 22px;
+
+    letter-spacing: 5px;
+  }
+
+  .client-admin-btn {
+    height: 42px;
+
+    padding: 0 14px;
+
+    font-size: 13px;
+  }
+
+  .client-logo-box h1 {
+    font-size: 48px;
+
+    letter-spacing: 10px;
+  }
+
+  .client-logo-box p {
+    font-size: 12px;
+
+    letter-spacing: 4px;
+  }
+
+  .client-landing-content h2 {
+    font-size: 34px;
+  }
+
+  .client-subtitle {
+    font-size: 18px;
+  }
+}

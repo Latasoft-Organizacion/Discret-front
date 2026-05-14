@@ -1,0 +1,448 @@
+/* Reset general y fuente principal */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+}
+
+/* Fondo principal del body */
+body {
+  background: #0d111c;
+}
+
+/* Contenedor principal del login */
+.login-layout {
+  min-height: 100vh;
+  display: flex;
+  background: radial-gradient(circle at center, #171d2b 0%, #0d111c 55%, #080b12 100%);
+  color: #f8fafc;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Imagen lateral del motel */
+.login-photo {
+  width: 62%;
+  min-height: 100vh;
+
+  background: url('../assets/images/motel-login.png');
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  position: relative;
+  overflow: visible;
+}
+
+/* Capa para borrar el corte entre imagen y panel */
+.login-layout::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 42%;
+  width: 28%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+
+  background: linear-gradient(
+    to right,
+    rgba(13, 17, 28, 0),
+    #0d111c 45%,
+    #0d111c 100%
+  );
+}
+
+/* Degradado que se extiende hacia el panel */
+.login-photo::after {
+  content: '';
+
+  position: absolute;
+  top: 0;
+  right: -45%;
+
+  width: 90%;
+  height: 100%;
+
+  pointer-events: none;
+  z-index: 2;
+
+  background: linear-gradient(
+    to right,
+    rgba(7, 10, 18, 0) 0%,
+    rgba(7, 10, 18, 0.45) 25%,
+    rgba(7, 10, 18, 0.80) 50%,
+    rgba(7, 10, 18, 0.96) 75%,
+    #0d111c 100%
+  );
+}
+
+/* Degradado lateral sobre la imagen */
+.login-photo::after {
+  content: '';
+
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  width: 75%;
+  height: 100%;
+
+  pointer-events: none;
+
+  background: linear-gradient(
+    to right,
+
+    rgba(7, 10, 18, 0) 0%,
+    rgba(7, 10, 18, 0.25) 20%,
+    rgba(7, 10, 18, 0.55) 38%,
+    rgba(7, 10, 18, 0.82) 55%,
+    rgba(7, 10, 18, 0.96) 72%,
+    #0d111c 100%
+  );
+}
+
+/* Texto sobre la imagen */
+.photo-overlay {
+  position: absolute;
+  left: 60px;
+  top: 250px;
+  color: #fff;
+}
+
+/* Titulo neon lateral */
+.photo-overlay h2 {
+  font-size: 62px;
+  letter-spacing: 8px;
+  color: #ff4f9a;
+
+  /* Efecto glow */
+  text-shadow: 0 0 18px rgba(255, 79, 154, 0.9);
+
+  font-weight: 300;
+}
+
+/* Subtitulo bajo el logo */
+.photo-overlay p {
+  font-size: 16px;
+  margin-top: 8px;
+  color: #f4f4f5;
+}
+
+/* Contenedor donde va el panel */
+.login-content {
+  flex: 1;
+  min-height: 100vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+
+  padding-left: 0;
+  padding-right: 30px;
+  gap: 10px;
+
+  position: relative;
+  z-index: 3;
+
+   /* Mueve el panel hacia la izquierda */
+  transform: translateX(-120px);
+}
+
+
+
+/* Card principal del login */
+.login-card {
+  width: 480px;
+  padding: 32px 34px;
+  border-radius: 12px;
+
+  background: rgba(20, 26, 39, 0.84);
+
+  
+  /* Borde ultra suave */
+border: 1px solid rgba(255, 255, 255, 0.03);
+
+/* Sombra amplia y cinematica */
+box-shadow:
+  0 0 0 1px rgba(255,255,255,0.02),
+  0 25px 80px rgba(0, 0, 0, 0.42),
+  0 0 60px rgba(0, 0, 0, 0.18);
+
+  /* Borde más suave para que no se marque tanto */
+
+border: 1px solid rgba(255, 255, 255, 0.04);
+
+/* Sombra mucho más suave */
+box-shadow:
+  0 10px 35px rgba(0, 0, 0, 0.14);
+
+/* Sombra más pareja y menos dura */
+box-shadow: 0 18px 45px rgba(0, 0, 0, 0.22);
+  /* Efecto blur glass */
+  backdrop-filter: blur(16px);
+
+    /* Escala general del panel */
+  transform: scale(0.88) translateZ(0);
+   isolation: isolate;
+  
+}
+
+/* Circulo del icono principal */
+.icon-circle {
+  width: 74px;
+  height: 74px;
+
+  margin: 0 auto 26px;
+
+  border: 3px solid #f472b6;
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #f472b6;
+  font-size: 30px;
+
+  /* Glow rosado */
+  box-shadow: 0 0 28px rgba(244, 114, 182, 0.25);
+}
+
+/* Titulo principal */
+.login-card h1 {
+  text-align: center;
+  font-size: 34px;
+  margin-bottom: 12px;
+  font-weight: 800;
+}
+
+/* Subtitulo */
+.login-card h3 {
+  text-align: center;
+  color: #f472b6;
+  font-size: 18px;
+  margin-bottom: 36px;
+  font-weight: 600;
+}
+
+/* Separador con icono */
+.divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 32px;
+
+  color: #f472b6;
+}
+
+/* Lineas laterales del separador */
+.divider::before,
+.divider::after {
+  content: '';
+  height: 1px;
+  width: 160px;
+  background: rgba(148, 163, 184, 0.18);
+}
+
+/* Espaciado del icono */
+.divider span {
+  margin: 0 20px;
+}
+
+/* Formulario general */
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Labels de los inputs */
+form label {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+/* Contenedor de inputs */
+.input-group {
+  height: 62px;
+
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  background: rgba(15, 23, 42, 0.75);
+
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 10px;
+
+  padding: 0 18px;
+
+  margin-bottom: 28px;
+}
+
+/* Iconos dentro del input */
+.input-group span {
+  opacity: 0.75;
+}
+
+/* Input principal */
+.input-group input {
+  flex: 1;
+
+  background: transparent;
+
+  border: none;
+  outline: none;
+
+  color: #f8fafc;
+  font-size: 16px;
+}
+
+/* Placeholder del input */
+.input-group input::placeholder {
+  color: #8b93a5;
+}
+
+/* Boton mostrar contraseña */
+.eye-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+/* Opciones bajo contraseña */
+.login-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 34px;
+}
+
+/* Recordarme */
+.remember {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  margin: 0;
+
+  font-weight: 600;
+}
+
+/* Checkbox */
+.remember input {
+  width: 22px;
+  height: 22px;
+
+  accent-color: #ec4899;
+}
+
+/* Link recuperar contraseña */
+.login-options a {
+  color: #f472b6;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+/* Boton login */
+.login-button {
+  height: 60px;
+
+  border: none;
+  border-radius: 10px;
+
+  /* Gradiente rosado */
+  background: linear-gradient(135deg, #ec4899, #db2777);
+
+  color: white;
+
+  font-size: 20px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  /* Glow boton */
+  box-shadow: 0 14px 32px rgba(236, 72, 153, 0.35);
+
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Hover boton */
+.login-button:hover {
+  transform: translateY(-2px);
+
+  box-shadow: 0 18px 40px rgba(236, 72, 153, 0.45);
+}
+
+/* Footer inferior  - titulo Acceso exclusivo para administradores */
+.login-footer {
+  margin-top: -28px;
+
+  text-align: center;
+
+  color: #7d8495;
+
+  font-size: 14px;
+  line-height: 2;
+}
+
+.login-footer p:last-child {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 900px) {
+
+  /* Login vertical en celular */
+  .login-layout {
+    overflow: hidden;
+    flex-direction: column;
+  }
+
+  /* Ajustes imagen responsive */
+  .login-photo {
+    width: 62%;
+    min-height: 100vh;
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    position: relative;
+  }
+
+  /* Padding celular */
+  .login-content {
+    padding-right: 0;
+  }
+
+  /* Card responsive */
+  .login-card {
+    width: 100%;
+    max-width: 600px;
+    padding: 38px 26px;
+  }
+
+  /* Titulo responsive */
+  .login-card h1 {
+  font-size: 30px;
+  }
+
+  /* Opciones bajo login en columna */
+  .login-options {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+}

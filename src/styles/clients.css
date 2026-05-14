@@ -1,0 +1,461 @@
+/* =========================
+   CONFIGURACION GENERAL
+========================= */
+
+.clients-page {
+  min-height: 100vh;
+  padding: 28px 36px;
+  background: radial-gradient(circle at top, #161d2b 0%, #0d111c 45%, #080b12 100%);
+  color: #f8fafc;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+}
+
+
+/* =========================
+   HEADER SUPERIOR
+========================= */
+
+.clients-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.clients-top h1 {
+  font-size: 30px;
+}
+
+.clients-top p,
+.client-info p,
+.client-card p {
+  color: #94a3b8;
+}
+
+
+/* =========================
+   ACCIONES SUPERIORES
+========================= */
+
+.clients-top-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px;
+}
+
+.clients-search {
+  width: 280px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  background: rgba(17, 24, 39, 0.82);
+  border: 1px solid rgba(148, 163, 184, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
+}
+
+/* ICONO BUSCADOR */
+.clients-search svg {
+  min-width: 18px;
+  min-height: 18px;
+
+  color: #ff4fa3;
+
+  opacity: 0.9;
+}
+
+.clients-search input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #f8fafc;
+  font-size: 14px;
+}
+
+.clients-search input::placeholder {
+  color: #94a3b8;
+}
+
+
+/* =========================
+   BOTONES
+========================= */
+
+.clients-top button,
+.clients-filters button,
+.client-actions button {
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.clients-top-actions button {
+  height: 48px;
+  padding: 0 18px;
+  background: linear-gradient(135deg, #ec4899, #db2777);
+  color: white;
+  white-space: nowrap;
+  transition: 0.2s ease;
+
+    display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* ICONO BOTON */
+.clients-top-actions button svg {
+  min-width: 18px;
+  min-height: 18px;
+}
+
+.clients-top-actions button:hover {
+  transform: translateY(-2px);
+}
+
+
+/* =========================
+   RESUMEN SUPERIOR
+========================= */
+
+.clients-summary {
+  margin-top: 28px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.clients-summary article {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px;
+  background: rgba(17, 24, 39, 0.82);
+  border: 1px solid rgba(148, 163, 184, 0.08);
+  border-radius: 14px;
+}
+
+.clients-summary span {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0f172a;
+  border-radius: 12px;
+}
+
+.clients-summary strong {
+  font-size: 24px;
+}
+
+.clients-summary p {
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+
+/* =========================
+   FILTROS
+========================= */
+
+.clients-filters {
+  display: flex;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.clients-filters button {
+  padding: 10px 16px;
+  background: #111827;
+  color: #cbd5e1;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: 0.2s ease;
+}
+
+.clients-filters button.active,
+.clients-filters button:hover {
+  background: #ec4899;
+  color: white;
+}
+
+
+/* =========================
+   LISTADO CLIENTES
+========================= */
+
+.clients-list {
+  margin-top: 22px;
+  display: grid;
+  gap: 16px;
+}
+
+.client-card {
+  display: grid;
+  grid-template-columns: 70px 1.2fr 100px 160px 130px 180px;
+  align-items: center;
+  gap: 18px;
+  padding: 18px;
+  background: rgba(17, 24, 39, 0.82);
+  border: 1px solid rgba(148, 163, 184, 0.08);
+  border-radius: 14px;
+  position: relative;
+  overflow: hidden;
+  transition: 0.25s ease;
+}
+
+.client-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(236, 72, 153, 0.16);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.24);
+}
+
+.client-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  opacity: 0.85;
+}
+
+.client-card.frecuente::after {
+  background: #ec4899;
+}
+
+.client-card.nuevo::after {
+  background: #22c55e;
+}
+
+
+/* =========================
+   INFO CLIENTE
+========================= */
+
+.client-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: #0f172a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f472b6;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.client-info h2 {
+  font-size: 20px;
+}
+
+
+/* =========================
+   ESTADO CLIENTE
+========================= */
+
+.client-status {
+  text-align: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.client-status.frecuente {
+  background: rgba(236, 72, 153, 0.12);
+  color: #ec4899;
+}
+
+.client-status.nuevo {
+  background: rgba(34, 197, 94, 0.12);
+  color: #22c55e;
+}
+
+
+/* =========================
+   ACCIONES
+========================= */
+
+.client-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.client-actions button {
+  padding: 10px 12px;
+  background: #0f172a;
+  color: #cbd5e1;
+  border: 1px solid transparent;
+  transition: 0.2s ease;
+}
+
+.client-actions button:hover {
+  color: white;
+  border: 1px solid rgba(236, 72, 153, 0.25);
+  background: rgba(236, 72, 153, 0.08);
+}
+
+/* =========================
+   PAGINACION CLIENTES
+========================= */
+
+.clients-pagination {
+  margin-top: 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+.clients-pagination div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.clients-pagination button {
+  padding: 10px 14px;
+
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 10px;
+
+  background: #0f172a;
+  color: #cbd5e1;
+
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.clients-pagination button:hover:not(:disabled) {
+  color: white;
+  border-color: rgba(236, 72, 153, 0.35);
+  background: rgba(236, 72, 153, 0.08);
+}
+
+.clients-pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+
+/* ========================================
+   ICONOS RESUMEN CLIENTES
+======================================== */
+
+.clients-summary-icon {
+  width: 44px;
+  height: 44px;
+
+  border-radius: 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(236, 72, 153, 0.16),
+      rgba(15, 23, 42, 0.96)
+    );
+
+  border: 1px solid rgba(236, 72, 153, 0.22);
+
+  color: #ff4fa3;
+
+  box-shadow:
+    0 0 14px rgba(236, 72, 153, 0.18),
+    inset 0 0 18px rgba(236, 72, 153, 0.05);
+}
+
+/* SVG NEON ROSADO */
+.clients-summary-icon svg {
+  color: #ff4fa3;
+
+  filter:
+    drop-shadow(0 0 6px rgba(236, 72, 153, 0.55));
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 1000px) {
+
+  .clients-summary,
+  .client-card {
+    grid-template-columns: 1fr;
+  }
+
+  .client-card {
+    text-align: center;
+  }
+
+  .client-actions {
+    justify-content: center;
+  }
+
+  .clients-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 18px;
+  }
+
+  .clients-top-actions {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .clients-search {
+    width: 100%;
+  }
+
+
+  /* ========================================
+   ICONOS RESUMEN CLIENTES
+======================================== */
+
+.clients-summary-icon {
+  width: 62px;
+  height: 62px;
+
+  border-radius: 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(236, 72, 153, 0.14),
+      rgba(15, 23, 42, 0.92)
+    );
+
+  border: 1px solid rgba(236, 72, 153, 0.18);
+
+  color: #ff4fa3;
+
+  box-shadow:
+    0 0 14px rgba(236, 72, 153, 0.14),
+    inset 0 0 18px rgba(236, 72, 153, 0.05);
+}
+
+.clients-summary-icon svg {
+  filter:
+    drop-shadow(0 0 6px rgba(236, 72, 153, 0.5));
+}
+}
