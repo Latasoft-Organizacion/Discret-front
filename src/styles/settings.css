@@ -4,6 +4,8 @@
 
 .settings-page {
   min-height: 100vh;
+  width: calc(100% - 230px);
+  margin-left: 230px;
   padding: 28px 36px;
 
   background: radial-gradient(circle at top, #161d2b 0%, #0d111c 45%, #080b12 100%);
@@ -25,12 +27,17 @@
 }
 
 .settings-top h1 {
-  font-size: 30px;
+  font-size: 24px;
+  padding-left: 50px;
 }
 
 .settings-top p,
 .settings-card p {
   color: #94a3b8;
+}
+
+.settings-top p {
+  padding-left: 50px;
 }
 
 
@@ -286,6 +293,11 @@
 ========================= */
 
 @media (max-width: 1000px) {
+  .settings-page {
+    width: 100%;
+    margin-left: 0;
+    padding: 78px 18px 24px;
+  }
 
   .settings-summary,
   .settings-content,
@@ -308,4 +320,15 @@
 .full-width {
   grid-column: 1 / -1;
 }
+}
+
+.admin-sidebar.is-collapsed + .settings-page {
+  padding-left: 82px;
+}
+
+@media (max-width: 1000px) {
+  .admin-sidebar.is-collapsed + .settings-page,
+  .admin-sidebar.is-open + .settings-page {
+    padding-left: 18px;
+  }
 }

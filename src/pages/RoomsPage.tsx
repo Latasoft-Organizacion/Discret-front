@@ -15,17 +15,49 @@ import AdminSidebar from '../components/AdminSidebar';
 import '../styles/adminSidebar.css';
 import '../styles/rooms.css';
 
+type Room = {
+  number: number;
+  type: string;
+  status: 'Disponible' | 'Ocupada' | 'Limpieza';
+  price: string;
+};
+
 function RoomsPage() {
   // Estado para mostrar u ocultar el modal
   const [showModal, setShowModal] = useState(false);
+  const [editingRoom, setEditingRoom] = useState<Room | null>(null);
+  const [editingRoomNumber, setEditingRoomNumber] = useState<number | null>(null);
+  const [detailRoom, setDetailRoom] = useState<Room | null>(null);
 
   // Datos simulados de habitaciones
-  const rooms = [
+  const [rooms, setRooms] = useState<Room[]>([
     { number: 101, type: 'Suite estándar', status: 'Disponible', price: '$25.000' },
     { number: 102, type: 'Suite premium', status: 'Ocupada', price: '$35.000' },
     { number: 103, type: 'Suite jacuzzi', status: 'Limpieza', price: '$45.000' },
     { number: 104, type: 'Suite estándar', status: 'Disponible', price: '$25.000' },
-  ];
+  ]);
+
+  const handleUpdateRoom = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!editingRoom) {
+      return;
+    }
+
+    if (!editingRoom.number || !editingRoom.type || !editingRoom.price || !editingRoom.status) {
+      alert('Completa todos los campos de la habitación.');
+      return;
+    }
+
+    setRooms((currentRooms) =>
+      currentRooms.map((room) =>
+        room.number === editingRoomNumber ? editingRoom : room
+      )
+    );
+
+    setEditingRoom(null);
+    setEditingRoomNumber(null);
+  };
 
   return (
     <main className="rooms-admin-layout">
@@ -130,12 +162,18 @@ function RoomsPage() {
               </span>
 
               <div className="room-actions">
-                <button type="button">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditingRoom(room);
+                    setEditingRoomNumber(room.number);
+                  }}
+                >
                   <Pencil size={16} />
                   Editar
                 </button>
 
-                <button type="button">
+                <button type="button" onClick={() => setDetailRoom(room)}>
                   <Eye size={16} />
                   Ver detalle
                 </button>
@@ -195,6 +233,147 @@ function RoomsPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {editingRoom && (
+        <div className="room-modal-overlay">
+          <div className="room-modal">
+            <div className="room-modal-header">
+              <div>
+                <h2>Editar habitación</h2>
+                <p>Actualiza los datos principales de la habitación.</p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setEditingRoom(null);
+                  setEditingRoomNumber(null);
+                }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <form className="room-modal-form" onSubmit={handleUpdateRoom}>
+              <label>
+                Número habitación
+                <input
+                  type="number"
+                  value={editingRoom.number}
+                  onChange={(event) =>
+                    setEditingRoom((room) =>
+                      room ? { ...room, number: Number(event.target.value) } : room
+                    )
+                  }
+                />
+              </label>
+
+              <label>
+                Tipo habitación
+                <input
+                  type="text"
+                  value={editingRoom.type}
+                  onChange={(event) =>
+                    setEditingRoom((room) =>
+                      room ? { ...room, type: event.target.value } : room
+                    )
+                  }
+                />
+              </label>
+
+              <label>
+                Precio
+                <input
+                  type="text"
+                  value={editingRoom.price}
+                  onChange={(event) =>
+                    setEditingRoom((room) =>
+                      room ? { ...room, price: event.target.value } : room
+                    )
+                  }
+                />
+              </label>
+
+              <label>
+                Estado
+                <select
+                  value={editingRoom.status}
+                  onChange={(event) =>
+                    setEditingRoom((room) =>
+                      room
+                        ? { ...room, status: event.target.value as Room['status'] }
+                        : room
+                    )
+                  }
+                >
+                  <option>Disponible</option>
+                  <option>Ocupada</option>
+                  <option>Limpieza</option>
+                </select>
+              </label>
+
+              <div className="room-modal-actions">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditingRoom(null);
+                    setEditingRoomNumber(null);
+                  }}
+                >
+                  Cancelar
+                </button>
+
+                <button type="submit">
+                  Guardar cambios
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {detailRoom && (
+        <div className="room-modal-overlay">
+          <div className="room-modal">
+            <div className="room-modal-header">
+              <div>
+                <h2>Detalle habitación</h2>
+                <p>Información operativa de la habitación seleccionada.</p>
+              </div>
+
+              <button type="button" onClick={() => setDetailRoom(null)}>
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="room-detail-modal-card">
+              <div className="room-detail-modal-icon">
+                <Bed size={34} />
+              </div>
+
+              <div>
+                <span>Habitación</span>
+                <strong>{detailRoom.number}</strong>
+              </div>
+
+              <div>
+                <span>Tipo</span>
+                <strong>{detailRoom.type}</strong>
+              </div>
+
+              <div>
+                <span>Precio</span>
+                <strong>{detailRoom.price}</strong>
+              </div>
+
+              <div>
+                <span>Estado</span>
+                <strong>{detailRoom.status}</strong>
+              </div>
+            </div>
           </div>
         </div>
       )}

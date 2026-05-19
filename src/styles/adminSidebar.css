@@ -14,6 +14,52 @@
 
   display: flex;
   flex-direction: column;
+
+  transition: transform 0.25s ease;
+}
+
+.admin-sidebar.is-collapsed {
+  transform: translateX(-100%);
+}
+
+.admin-sidebar-toggle {
+  position: fixed;
+  left: 246px;
+  top: 18px;
+  z-index: 130;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(236, 72, 153, 0.35);
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.92);
+  color: #ff4fa3;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+  transition: left 0.25s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+
+.admin-sidebar-toggle.is-closed {
+  left: 18px;
+  top: 18px;
+}
+
+.admin-sidebar-toggle:hover {
+  border-color: rgba(236, 72, 153, 0.7);
+  transform: translateY(-1px);
+}
+
+.admin-sidebar.is-collapsed + .dashboard-main,
+.admin-sidebar.is-collapsed + .admin-reservations-main,
+.admin-sidebar.is-collapsed + .rooms-admin-main,
+.admin-sidebar.is-collapsed + .agenda-page,
+.admin-sidebar.is-collapsed + .clients-page,
+.admin-sidebar.is-collapsed + .reports-page,
+.admin-sidebar.is-collapsed + .settings-page {
+  width: 100%;
+  margin-left: 0;
 }
 
 .admin-brand h1 {
@@ -69,4 +115,69 @@
 .admin-menu a:hover {
   background: #ec4899;
   color: white;
+}
+
+.admin-logout-link {
+  height: 42px;
+  margin-top: auto;
+  color: #cbd5e1;
+  text-decoration: none;
+  padding: 0 14px;
+  border: 1px solid rgba(236, 72, 153, 0.22);
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.72);
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: 0.2s ease;
+}
+
+.admin-logout-link svg {
+  color: #ff4fa3;
+}
+
+.admin-logout-link:hover {
+  background: rgba(236, 72, 153, 0.14);
+  border-color: rgba(236, 72, 153, 0.45);
+  color: #ffffff;
+}
+
+@media (max-width: 1000px) {
+  .admin-sidebar {
+    width: min(280px, calc(100vw - 76px));
+    min-height: 100svh;
+    position: fixed;
+    transform: translateX(-100%);
+    box-shadow: 22px 0 46px rgba(0, 0, 0, 0.34);
+  }
+
+  .admin-sidebar.is-open {
+    transform: translateX(0);
+  }
+
+  .admin-sidebar-toggle,
+  .admin-sidebar-toggle.is-closed {
+    left: 16px;
+    top: 16px;
+  }
+
+  .admin-sidebar.is-open + .dashboard-main,
+  .admin-sidebar.is-open + .admin-reservations-main,
+  .admin-sidebar.is-open + .rooms-admin-main,
+  .admin-sidebar.is-open + .agenda-page,
+  .admin-sidebar.is-open + .clients-page,
+  .admin-sidebar.is-open + .reports-page,
+  .admin-sidebar.is-open + .settings-page,
+  .admin-sidebar.is-collapsed + .dashboard-main,
+  .admin-sidebar.is-collapsed + .admin-reservations-main,
+  .admin-sidebar.is-collapsed + .rooms-admin-main,
+  .admin-sidebar.is-collapsed + .agenda-page,
+  .admin-sidebar.is-collapsed + .clients-page,
+  .admin-sidebar.is-collapsed + .reports-page,
+  .admin-sidebar.is-collapsed + .settings-page {
+    width: 100%;
+    margin-left: 0;
+  }
 }

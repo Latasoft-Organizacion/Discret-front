@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import {
@@ -8,6 +9,9 @@ import {
   Users,
   ChartColumn,
   Settings,
+  LogOut,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from 'lucide-react';
 
 type Props = {
@@ -15,10 +19,27 @@ type Props = {
 };
 
 function AdminSidebar({ active }: Props) {
+  const [isOpen, setIsOpen] = useState(() => {
+    if (typeof window === 'undefined') {
+      return true;
+    }
+
+    return window.innerWidth > 1000;
+  });
 
   return (
+    <>
+      <button
+        type="button"
+        className={`admin-sidebar-toggle ${isOpen ? 'is-open' : 'is-closed'}`}
+        aria-label={isOpen ? 'Ocultar menú lateral' : 'Mostrar menú lateral'}
+        aria-expanded={isOpen}
+        onClick={() => setIsOpen((current) => !current)}
+      >
+        {isOpen ? <PanelLeftClose size={20} /> : <PanelLeftOpen size={20} />}
+      </button>
 
-    <aside className="admin-sidebar">
+    <aside className={`admin-sidebar ${isOpen ? 'is-open' : 'is-collapsed'}`}>
 
       {/* LOGO */}
       <div className="admin-brand">
@@ -93,7 +114,13 @@ function AdminSidebar({ active }: Props) {
 
       </nav>
 
+      <Link to="/login" className="admin-logout-link">
+        <LogOut size={18} />
+        Cerrar sesión
+      </Link>
+
     </aside>
+    </>
 
   );
 }

@@ -36,7 +36,6 @@ function AppRouter() {
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/habitaciones" element={<RoomsPage />} />
         <Route path="/reservas" element={<ReservationsPage />} />
-        <Route path="/reservas-admin" element={<ReservationsPage />} />
         <Route path="/agenda" element={<AgendaPage />} />
         <Route path="/clientes" element={<ClientsPage />} />
         <Route path="/reportes" element={<ReportsPage />} />

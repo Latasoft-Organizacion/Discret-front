@@ -139,6 +139,10 @@
   gap: 10px;
 }
 
+.client-form-group + .client-form-group {
+  margin-top: 22px;
+}
+
 .client-form-group.full {
   grid-column: 1 / -1;
 }
@@ -428,19 +432,53 @@
 
 @media (max-width: 900px) {
   .client-reservation-page {
-    padding: 24px 18px;
+    padding: 22px 14px;
   }
 
-  .client-reservation-header,
+  .client-reservation-header {
+    display: none;
+  }
+
+  .client-reservation-title {
+    margin-top: 0;
+    text-align: center;
+  }
+
+  .client-reservation-title h1 {
+    font-size: 30px;
+  }
+
+  .client-reservation-title p {
+    font-size: 15px;
+  }
+
   .client-reservation-actions {
-    flex-direction: column;
-    align-items: stretch;
+    position: sticky;
+    bottom: 0;
+    z-index: 8;
+    margin: 18px -14px 0;
+    padding: 12px 14px 16px;
+    display: grid;
+    grid-template-columns: 0.82fr 1.18fr;
+    gap: 10px;
+    background: linear-gradient(180deg, rgba(7, 11, 20, 0), rgba(7, 11, 20, 0.96) 22%);
   }
 
   .client-back-btn,
   .cancel-reservation-btn,
   .save-reservation-btn {
     width: 100%;
+  }
+
+  .cancel-reservation-btn,
+  .save-reservation-btn {
+    height: 56px;
+    border-radius: 12px;
+    font-size: 15px;
+  }
+
+  .client-reservation-logo {
+    margin: 26px auto 22px;
   }
 
   .client-reservation-logo h2 {
@@ -454,16 +492,105 @@
   }
 
   .client-reservation-card {
-    padding: 22px;
+    padding: 22px 18px;
+    border-color: rgba(148, 163, 184, 0.18);
   }
 
-  .client-form-grid,
-  .people-options,
-  .available-hours-grid {
+  .client-form-grid {
     grid-template-columns: 1fr;
+  }
+
+  .client-form-group label {
+    font-size: 14px;
+  }
+
+  .client-form-group + .client-form-group {
+    margin-top: 18px;
+  }
+
+  .client-form-group input,
+  .client-form-group select {
+    height: 50px;
+    padding: 0 14px;
+    font-size: 14px;
+    border-radius: 8px;
+  }
+
+  .people-options {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .people-options button {
+    height: 64px;
+    padding: 0 8px;
+    border-radius: 10px;
+    gap: 7px;
+  }
+
+  .people-options button svg {
+    min-width: 18px;
+    min-height: 18px;
+  }
+
+  .people-options button span {
+    font-size: 12px;
+    line-height: 1.15;
+  }
+
+  .available-hours-section {
+    margin-top: 26px;
+  }
+
+  .hours-title {
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+
+  .hours-title strong {
+    font-size: 14px;
+    letter-spacing: 5px;
+    text-align: center;
+  }
+
+  .available-hours-grid {
+    max-height: 250px;
+    padding-right: 4px;
+    overflow-y: auto;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    scrollbar-color: #ec4899 rgba(8, 13, 24, 0.72);
+    scrollbar-width: thin;
+  }
+
+  .available-hours-grid button {
+    height: 52px;
+    border-radius: 8px;
+    font-size: 14px;
+    white-space: nowrap;
   }
 
   .phone-field {
     grid-template-columns: 110px 1fr;
+  }
+}
+
+@media (max-width: 420px) {
+  .client-reservation-logo h2 {
+    font-size: 38px;
+    letter-spacing: 7px;
+  }
+
+  .client-reservation-logo p {
+    font-size: 10px;
+    letter-spacing: 3px;
+  }
+
+  .client-reservation-card {
+    padding: 18px 14px;
+  }
+
+  .available-hours-grid {
+    max-height: 224px;
   }
 }

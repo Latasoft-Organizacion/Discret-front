@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import { Search } from 'lucide-react';
+import AdminSidebar from '../components/AdminSidebar';
+import '../styles/adminSidebar.css';
 import '../styles/agenda.css';
 
 function AgendaPage() {
@@ -15,6 +18,8 @@ function AgendaPage() {
   ];
 
   return (
+    <>
+    <AdminSidebar active="agenda" />
     <main className="agenda-page">
 
       {/* Header superior */}
@@ -29,7 +34,7 @@ function AgendaPage() {
 
           {/* Buscador */}
           <div className="agenda-search">
-            <span>🔍</span>
+            <Search size={18} strokeWidth={2.4} />
 
             <input
               type="text"
@@ -236,6 +241,7 @@ function AgendaPage() {
       )}
 
     </main>
+    </>
   );
 }
 

@@ -14,7 +14,8 @@ body {
 /* Contenedor principal del login */
 .login-layout {
   min-height: 100vh;
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(420px, 0.92fr);
   background: radial-gradient(circle at center, #171d2b 0%, #0d111c 55%, #080b12 100%);
   color: #f8fafc;
   position: relative;
@@ -23,7 +24,7 @@ body {
 
 /* Imagen lateral del motel */
 .login-photo {
-  width: 62%;
+  width: 100%;
   min-height: 100vh;
 
   background: url('../assets/images/motel-login.png');
@@ -133,7 +134,6 @@ body {
 
 /* Contenedor donde va el panel */
 .login-content {
-  flex: 1;
   min-height: 100vh;
 
   display: flex;
@@ -141,22 +141,19 @@ body {
   justify-content: center;
   flex-direction: column;
 
-  padding-left: 0;
-  padding-right: 30px;
-  gap: 10px;
+  padding: 48px clamp(24px, 5vw, 72px) 34px;
+  gap: 18px;
 
   position: relative;
   z-index: 3;
-
-   /* Mueve el panel hacia la izquierda */
-  transform: translateX(-120px);
+  transform: translateX(-42px);
 }
 
 
 
 /* Card principal del login */
 .login-card {
-  width: 480px;
+  width: min(100%, 460px);
   padding: 32px 34px;
   border-radius: 12px;
 
@@ -185,8 +182,6 @@ box-shadow: 0 18px 45px rgba(0, 0, 0, 0.22);
   /* Efecto blur glass */
   backdrop-filter: blur(16px);
 
-    /* Escala general del panel */
-  transform: scale(0.88) translateZ(0);
    isolation: isolate;
   
 }
@@ -206,27 +201,43 @@ box-shadow: 0 18px 45px rgba(0, 0, 0, 0.22);
   justify-content: center;
 
   color: #f472b6;
-  font-size: 30px;
 
   /* Glow rosado */
-  box-shadow: 0 0 28px rgba(244, 114, 182, 0.25);
+  box-shadow:
+    0 0 28px rgba(244, 114, 182, 0.25),
+    inset 0 0 18px rgba(236, 72, 153, 0.08);
+}
+
+.icon-circle svg,
+.divider svg,
+.input-group svg,
+.eye-btn svg {
+  color: #ff4fa3;
+  filter: drop-shadow(0 0 8px rgba(236, 72, 153, 0.38));
 }
 
 /* Titulo principal */
 .login-card h1 {
   text-align: center;
-  font-size: 34px;
+  color: #ff4fa3;
+  font-size: 46px;
+  font-weight: 300;
+  letter-spacing: 10px;
+  line-height: 1;
   margin-bottom: 12px;
-  font-weight: 800;
+  text-shadow:
+    0 0 8px rgba(236, 72, 153, 0.9),
+    0 0 24px rgba(236, 72, 153, 0.68),
+    0 0 46px rgba(236, 72, 153, 0.36);
 }
 
 /* Subtitulo */
 .login-card h3 {
   text-align: center;
-  color: #f472b6;
-  font-size: 18px;
+  color: #ffffff;
+  font-size: 15px;
   margin-bottom: 36px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 /* Separador con icono */
@@ -252,6 +263,9 @@ box-shadow: 0 18px 45px rgba(0, 0, 0, 0.22);
 /* Espaciado del icono */
 .divider span {
   margin: 0 20px;
+  display: flex;
+  align-items: center;
+  color: #ff4fa3;
 }
 
 /* Formulario general */
@@ -287,7 +301,9 @@ form label {
 
 /* Iconos dentro del input */
 .input-group span {
-  opacity: 0.75;
+  display: flex;
+  align-items: center;
+  opacity: 0.9;
 }
 
 /* Input principal */
@@ -313,7 +329,10 @@ form label {
   background: none;
   border: none;
   cursor: pointer;
-  opacity: 0.7;
+  opacity: 0.85;
+  display: flex;
+  align-items: center;
+  color: #ff4fa3;
 }
 
 /* Opciones bajo contraseña */
@@ -383,7 +402,7 @@ form label {
 
 /* Footer inferior  - titulo Acceso exclusivo para administradores */
 .login-footer {
-  margin-top: -28px;
+  margin-top: 0;
 
   text-align: center;
 
@@ -406,43 +425,112 @@ form label {
 
   /* Login vertical en celular */
   .login-layout {
-    overflow: hidden;
-    flex-direction: column;
+    min-height: 100svh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    display: block;
+    background:
+      linear-gradient(180deg, rgba(7, 10, 18, 0.68), rgba(7, 10, 18, 0.94)),
+      url('../assets/images/motel-login.png');
+    background-size: cover;
+    background-position: center;
   }
 
   /* Ajustes imagen responsive */
   .login-photo {
-    width: 62%;
-    min-height: 100vh;
+    display: none;
+  }
 
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-
-    position: relative;
+  .login-layout::before,
+  .login-photo::after {
+    display: none;
   }
 
   /* Padding celular */
   .login-content {
-    padding-right: 0;
+    min-height: 100svh;
+    padding: 28px 16px 24px;
+    justify-content: center;
+    transform: none;
   }
 
   /* Card responsive */
   .login-card {
     width: 100%;
-    max-width: 600px;
-    padding: 38px 26px;
+    max-width: 420px;
+    padding: 28px 22px;
+    border-color: rgba(236, 72, 153, 0.12);
   }
 
   /* Titulo responsive */
   .login-card h1 {
-  font-size: 30px;
+    font-size: 38px;
+    letter-spacing: 8px;
+  }
+
+  .login-card h3 {
+    font-size: 15px;
+    margin-bottom: 28px;
+  }
+
+  .icon-circle {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 22px;
+  }
+
+  .divider {
+    margin-bottom: 26px;
+  }
+
+  .divider::before,
+  .divider::after {
+    width: 110px;
+  }
+
+  .input-group {
+    height: 54px;
+    margin-bottom: 22px;
+    padding: 0 14px;
+  }
+
+  form label {
+    font-size: 14px;
   }
 
   /* Opciones bajo login en columna */
   .login-options {
+    gap: 12px;
+    margin-bottom: 26px;
+    font-size: 13px;
+  }
+
+  .remember input {
+    width: 18px;
+    height: 18px;
+  }
+
+  .login-button {
+    height: 56px;
+    font-size: 17px;
+  }
+
+  .login-footer {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 420px) {
+  .login-content {
+    padding: 22px 12px;
+  }
+
+  .login-card {
+    padding: 24px 18px;
+  }
+
+  .login-options {
     flex-direction: column;
     align-items: flex-start;
-    gap: 16px;
   }
 }

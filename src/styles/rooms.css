@@ -4,7 +4,7 @@
 
 .rooms-admin-layout {
   min-height: 100vh;
-  display: flex;
+  display: block;
 
   background:
     radial-gradient(circle at top,
@@ -15,6 +15,7 @@
   color: #f8fafc;
 
   font-family: 'Inter', 'Segoe UI', sans-serif;
+  overflow-x: hidden;
 }
 
 
@@ -155,6 +156,10 @@
   padding: 28px 36px;
 }
 
+.admin-sidebar.is-collapsed + .rooms-admin-main {
+  padding-left: 82px;
+}
+
 
 /* =========================
    CONFIGURACION GENERAL
@@ -177,17 +182,21 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 20px;
 }
 
 /* Titulo principal */
 .rooms-top h1 {
-  font-size: 30px;
+  font-size: 24px;
+  padding-left: 50px;
 }
 
 /* Subtitulo */
 .rooms-top p {
   color: #94a3b8;
   margin-top: 6px;
+  font-size: 14px;
+  padding-left: 50px;
 }
 
 
@@ -272,7 +281,7 @@
 
 /* Numero resumen */
 .rooms-summary strong {
-  font-size: 24px;
+  font-size: 18px;
 }
 
 /* Texto resumen */
@@ -319,9 +328,12 @@
     0 10px 24px rgba(0, 0, 0, 0.14);
 }
 
-/* Icono buscar */
-.rooms-search span {
-  opacity: 0.7;
+.rooms-search svg {
+  min-width: 18px;
+  min-height: 18px;
+  color: #ff4fa3;
+  opacity: 0.95;
+  filter: drop-shadow(0 0 6px rgba(236, 72, 153, 0.35));
 }
 
 /* Input buscar */
@@ -361,6 +373,7 @@
   border: 1px solid rgba(255, 255, 255, 0.06);
 
   transition: 0.2s ease;
+  font-size: 13px;
 }
 
 /* Filtro activo */
@@ -511,7 +524,7 @@
 ========================= */
 
 .room-info h2 {
-  font-size: 20px;
+  font-size: 18px;
 }
 
 /* Tipo habitación */
@@ -712,6 +725,48 @@
   color: white;
 }
 
+.room-detail-modal-card {
+  margin-top: 22px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.room-detail-modal-card > div {
+  padding: 16px;
+  border-radius: 12px;
+  background: #0f172a;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.room-detail-modal-icon {
+  grid-row: span 2;
+  min-height: 132px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ff4fa3;
+  box-shadow: inset 0 0 24px rgba(236, 72, 153, 0.05);
+}
+
+.room-detail-modal-icon svg {
+  filter: drop-shadow(0 0 8px rgba(236, 72, 153, 0.42));
+}
+
+.room-detail-modal-card span {
+  display: block;
+  margin-bottom: 7px;
+  color: #ff7fbd;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.room-detail-modal-card strong {
+  color: #ffffff;
+  font-size: 15px;
+}
+
 
 /* =========================
    RESPONSIVE
@@ -754,9 +809,12 @@
   flex-shrink: 0;
 }
 
-/* Icono buscar */
-.rooms-search span {
-  opacity: 0.7;
+.rooms-search svg {
+  min-width: 18px;
+  min-height: 18px;
+  color: #ff4fa3;
+  opacity: 0.95;
+  filter: drop-shadow(0 0 6px rgba(236, 72, 153, 0.35));
 }
 
 /* Input buscar */
@@ -793,6 +851,16 @@
 ========================= */
 
 @media (max-width: 1000px) {
+  .rooms-admin-main {
+    width: 100%;
+    margin-left: 0;
+    padding: 78px 18px 24px;
+  }
+
+  .admin-sidebar.is-collapsed + .rooms-admin-main,
+  .admin-sidebar.is-open + .rooms-admin-main {
+    padding-left: 18px;
+  }
 
   /* Cards resumen vertical */
   .rooms-summary {
@@ -830,6 +898,15 @@
   /* Buscador responsive */
   .rooms-search {
     width: 100%;
+  }
+
+  .room-detail-modal-card {
+    grid-template-columns: 1fr;
+  }
+
+  .room-detail-modal-icon {
+    grid-row: auto;
+    min-height: 92px;
   }
 
   /* =========================

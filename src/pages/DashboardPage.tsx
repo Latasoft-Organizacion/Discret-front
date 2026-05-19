@@ -7,6 +7,7 @@ import {
   MessageCircle,
   Unlock,
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 import AdminSidebar from '../components/AdminSidebar';
 
@@ -14,6 +15,8 @@ import '../styles/adminSidebar.css';
 import '../styles/dashboard.css';
 
 function DashboardPage() {
+  const navigate = useNavigate();
+
   // Datos simulados de habitaciones
   const rooms = [
     { number: 101, status: 'Disponible' },
@@ -134,13 +137,21 @@ function DashboardPage() {
               ))}
             </div>
 
-            <button className="primary-action">＋ Nueva reserva rápida</button>
+            <button
+              type="button"
+              className="primary-action"
+              onClick={() => navigate('/reservas-admin')}
+            >
+              ＋ Nueva reserva rápida
+            </button>
           </article>
 
           <article className="panel reservations-panel">
             <div className="panel-title horizontal">
               <h3>Reservas recientes</h3>
-              <a>Ver todas</a>
+              <button type="button" onClick={() => navigate('/reservas-admin')}>
+                Ver todas
+              </button>
             </div>
 
             {agenda.map((item, index) => (
@@ -170,22 +181,22 @@ function DashboardPage() {
           <h3>Acciones rápidas</h3>
 
           <div>
-            <button>
+            <button type="button" onClick={() => navigate('/habitaciones')}>
               <Bed size={20} />
               Ver habitaciones
             </button>
 
-            <button>
+            <button type="button" onClick={() => navigate('/habitaciones')}>
               <Lock size={20} />
               Bloquear habitación
             </button>
 
-            <button>
+            <button type="button" onClick={() => navigate('/reservas-admin')}>
               <CalendarDays size={20} />
               Nueva reserva
             </button>
 
-            <button>
+            <button type="button" onClick={() => navigate('/reportes')}>
               <ChartColumn size={20} />
               Reporte diario
             </button>

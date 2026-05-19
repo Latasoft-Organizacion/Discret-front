@@ -1,7 +1,11 @@
+import AdminSidebar from '../components/AdminSidebar';
+import '../styles/adminSidebar.css';
 import '../styles/settings.css';
 
 function SettingsPage() {
   return (
+    <>
+    <AdminSidebar active="configuracion" />
     <main className="settings-page">
 
       {/* Header superior */}
@@ -221,6 +225,7 @@ function SettingsPage() {
       </section>
 
     </main>
+    </>
   );
 }
 

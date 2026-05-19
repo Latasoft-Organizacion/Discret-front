@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import { Search } from 'lucide-react';
+import AdminSidebar from '../components/AdminSidebar';
+import '../styles/adminSidebar.css';
 import '../styles/reports.css';
 
 function ReportsPage() {
@@ -42,6 +45,8 @@ function ReportsPage() {
   };
 
   return (
+    <>
+    <AdminSidebar active="reportes" />
     <main className="reports-page">
 
       {/* Header superior */}
@@ -53,7 +58,7 @@ function ReportsPage() {
 
         <div className="reports-top-actions">
           <div className="reports-search">
-            <span>🔍</span>
+            <Search size={18} strokeWidth={2.4} />
             <input type="text" placeholder="Buscar reporte..." />
           </div>
 
@@ -226,6 +231,7 @@ function ReportsPage() {
       )}
 
     </main>
+    </>
   );
 }
 

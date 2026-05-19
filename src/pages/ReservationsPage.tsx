@@ -41,6 +41,8 @@ function ReservationsPage() {
     '6:30 pm',
     '7:00 pm',
     '7:30 pm',
+    '8:00 pm',
+    '8:30 pm',
   ];
 
   // Valida la selección y envía los datos a la ventana de confirmación
