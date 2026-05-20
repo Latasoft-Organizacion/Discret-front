@@ -207,6 +207,16 @@
   gap: 16px;
 }
 
+.clients-empty-state {
+  padding: 22px;
+  border: 1px solid rgba(236, 72, 153, 0.16);
+  border-radius: 14px;
+  background: rgba(17, 24, 39, 0.72);
+  color: #cbd5e1;
+  text-align: center;
+  font-size: 14px;
+}
+
 .client-card {
   display: grid;
   grid-template-columns: 70px minmax(190px, 1.2fr) 90px 140px 145px 120px 170px;

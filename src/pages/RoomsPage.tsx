@@ -4,7 +4,9 @@ import {
   Bed,
   Search,
   Plus,
-  Circle,
+  CheckCircle2,
+  Sparkles,
+  LockKeyhole,
   Pencil,
   Eye,
   X,
@@ -22,9 +24,12 @@ type Room = {
   price: string;
 };
 
+type RoomFilter = 'Todas' | Room['status'];
+
 function RoomsPage() {
   // Estado para mostrar u ocultar el modal
   const [showModal, setShowModal] = useState(false);
+  const [activeFilter, setActiveFilter] = useState<RoomFilter>('Todas');
   const [editingRoom, setEditingRoom] = useState<Room | null>(null);
   const [editingRoomNumber, setEditingRoomNumber] = useState<number | null>(null);
   const [detailRoom, setDetailRoom] = useState<Room | null>(null);
@@ -36,6 +41,22 @@ function RoomsPage() {
     { number: 103, type: 'Suite jacuzzi', status: 'Limpieza', price: '$45.000' },
     { number: 104, type: 'Suite estándar', status: 'Disponible', price: '$25.000' },
   ]);
+
+  const roomFilters: Array<{ label: string; value: RoomFilter }> = [
+    { label: 'Todas', value: 'Todas' },
+    { label: 'Disponibles', value: 'Disponible' },
+    { label: 'Ocupadas', value: 'Ocupada' },
+    { label: 'Limpieza', value: 'Limpieza' },
+  ];
+
+  const filteredRooms =
+    activeFilter === 'Todas'
+      ? rooms
+      : rooms.filter((room) => room.status === activeFilter);
+
+  const availableRooms = rooms.filter((room) => room.status === 'Disponible').length;
+  const occupiedRooms = rooms.filter((room) => room.status === 'Ocupada').length;
+  const cleaningRooms = rooms.filter((room) => room.status === 'Limpieza').length;
 
   const handleUpdateRoom = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -89,44 +110,44 @@ function RoomsPage() {
         <section className="rooms-summary">
           <article>
             <div className="rooms-summary-icon green">
-              <Circle size={18} fill="currentColor" />
+              <CheckCircle2 size={22} strokeWidth={2.4} />
             </div>
 
             <div>
-              <strong>2</strong>
+              <strong>{availableRooms}</strong>
               <p>Disponibles</p>
             </div>
           </article>
 
           <article>
             <div className="rooms-summary-icon pink">
-              <Circle size={18} fill="currentColor" />
+              <LockKeyhole size={22} strokeWidth={2.4} />
             </div>
 
             <div>
-              <strong>1</strong>
+              <strong>{occupiedRooms}</strong>
               <p>Ocupadas</p>
             </div>
           </article>
 
           <article>
-            <div className="rooms-summary-icon yellow">
-              <Circle size={18} fill="currentColor" />
+            <div className="rooms-summary-icon soft">
+              <Sparkles size={22} strokeWidth={2.4} />
             </div>
 
             <div>
-              <strong>1</strong>
+              <strong>{cleaningRooms}</strong>
               <p>En limpieza</p>
             </div>
           </article>
 
           <article>
-            <div className="rooms-summary-icon">
-              <Bed size={24} />
+            <div className="rooms-summary-icon blue">
+              <Bed size={24} strokeWidth={2.4} />
             </div>
 
             <div>
-              <strong>4</strong>
+              <strong>{rooms.length}</strong>
               <p>Total habitaciones</p>
             </div>
           </article>
@@ -134,15 +155,21 @@ function RoomsPage() {
 
         {/* Filtros rápidos */}
         <section className="rooms-filters">
-          <button className="active">Todas</button>
-          <button>Disponibles</button>
-          <button>Ocupadas</button>
-          <button>Limpieza</button>
+          {roomFilters.map((filter) => (
+            <button
+              key={filter.value}
+              type="button"
+              className={activeFilter === filter.value ? 'active' : ''}
+              onClick={() => setActiveFilter(filter.value)}
+            >
+              {filter.label}
+            </button>
+          ))}
         </section>
 
         {/* Listado de habitaciones */}
         <section className="rooms-list">
-          {rooms.map((room) => (
+          {filteredRooms.map((room) => (
             <article
               className={`room-detail-card ${room.status.toLowerCase()}`}
               key={room.number}
@@ -180,6 +207,12 @@ function RoomsPage() {
               </div>
             </article>
           ))}
+
+          {filteredRooms.length === 0 && (
+            <div className="rooms-empty-state">
+              No hay habitaciones para este estado.
+            </div>
+          )}
         </section>
       </section>
 

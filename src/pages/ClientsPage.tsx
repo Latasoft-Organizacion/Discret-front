@@ -23,9 +23,12 @@ interface Client {
   status: 'Frecuente' | 'Nuevo';
 }
 
+type ClientFilter = 'Todos' | 'Frecuentes' | 'Nuevos' | 'Activos';
+
 function ClientsPage() {
   // Página actual de la tabla
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [activeFilter, setActiveFilter] = useState<ClientFilter>('Todos');
   const [showClientModal, setShowClientModal] = useState(false);
   const [newClient, setNewClient] = useState({
     name: '',
@@ -46,6 +49,24 @@ function ClientsPage() {
     { id: 2, name: 'María López', phone: '+56 9 8765 4321', email: 'maria@email.com', frequentRoom: 'Hab. 105', visits: 2, lastVisit: '20/05/2026', status: 'Nuevo' },
     { id: 3, name: 'Carlos Rojas', phone: '+56 9 5555 1111', email: 'carlos@email.com', frequentRoom: 'Hab. 107', visits: 6, lastVisit: '18/05/2026', status: 'Frecuente' },
   ]);
+
+  const clientFilters: ClientFilter[] = ['Todos', 'Frecuentes', 'Nuevos', 'Activos'];
+
+  const filteredClients = clients.filter((client) => {
+    if (activeFilter === 'Todos') {
+      return true;
+    }
+
+    if (activeFilter === 'Frecuentes') {
+      return client.status === 'Frecuente';
+    }
+
+    if (activeFilter === 'Nuevos') {
+      return client.status === 'Nuevo';
+    }
+
+    return Boolean(client.phone || client.email);
+  });
 
   const handleCreateClient = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -102,14 +123,14 @@ function ClientsPage() {
   };
 
   // Total de páginas
-  const totalPages = Math.ceil(clients.length / clientsPerPage);
+  const totalPages = Math.ceil(filteredClients.length / clientsPerPage);
 
   // Índices para cortar la lista según la página actual
   const startIndex = (currentPage - 1) * clientsPerPage;
   const endIndex = startIndex + clientsPerPage;
 
   // Clientes que se muestran en la página actual
-  const visibleClients = clients.slice(startIndex, endIndex);
+  const visibleClients = filteredClients.slice(startIndex, endIndex);
 
   return (
     <>
@@ -232,10 +253,19 @@ function ClientsPage() {
 </section>
       {/* Filtros rápidos */}
       <section className="clients-filters">
-        <button type="button" className="active">Todos</button>
-        <button type="button">Frecuentes</button>
-        <button type="button">Nuevos</button>
-        <button type="button">Activos</button>
+        {clientFilters.map((filter) => (
+          <button
+            key={filter}
+            type="button"
+            className={activeFilter === filter ? 'active' : ''}
+            onClick={() => {
+              setActiveFilter(filter);
+              setCurrentPage(1);
+            }}
+          >
+            {filter}
+          </button>
+        ))}
       </section>
 
       {/* Listado de clientes */}
@@ -284,14 +314,20 @@ function ClientsPage() {
             </div>
           </article>
         ))}
+
+        {visibleClients.length === 0 && (
+          <div className="clients-empty-state">
+            No hay clientes para este filtro.
+          </div>
+        )}
       </section>
 
       {/* Paginación */}
       <section className="clients-pagination">
         <p>
-          Mostrando {clients.length === 0 ? 0 : startIndex + 1}
+          Mostrando {filteredClients.length === 0 ? 0 : startIndex + 1}
           -
-          {Math.min(endIndex, clients.length)} de {clients.length} clientes
+          {Math.min(endIndex, filteredClients.length)} de {filteredClients.length} clientes
         </p>
 
         <div>

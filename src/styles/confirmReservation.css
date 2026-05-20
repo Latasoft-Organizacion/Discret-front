@@ -79,8 +79,23 @@
   gap: 16px;
 }
 
-.confirm-summary-bar span {
-  font-size: 26px;
+.confirm-summary-icon {
+  width: 46px;
+  height: 46px;
+  min-width: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(236, 72, 153, 0.56);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, rgba(236, 72, 153, 0.24), rgba(236, 72, 153, 0.04) 62%),
+    rgba(15, 23, 42, 0.74);
+  color: #ff4fa3;
+  box-shadow:
+    0 0 14px rgba(236, 72, 153, 0.56),
+    inset 0 0 14px rgba(236, 72, 153, 0.1);
+  filter: drop-shadow(0 0 8px rgba(236, 72, 153, 0.58));
 }
 
 .confirm-summary-bar strong {

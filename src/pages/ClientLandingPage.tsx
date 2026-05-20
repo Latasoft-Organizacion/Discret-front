@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { type MouseEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Bed,
@@ -15,6 +15,7 @@ import {
 
 import '../styles/clientLanding.css';
 import discretLogo from '../assets/images/logo-discret.png';
+import whatsappIcon from '../assets/images/icono-whatsapp.png';
 import motelLogin from '../assets/images/motel-registro.png';
 
 const menuItems = [
@@ -22,7 +23,6 @@ const menuItems = [
   { label: '¿Quiénes somos?', href: '#quienes-somos' },
   { label: 'Beneficios', href: '#beneficios' },
   { label: 'Planes', href: '#planes' },
-  { label: 'Reservar', href: '#reservar' },
   { label: 'Contacto', href: '#contacto' },
 ];
 
@@ -61,8 +61,33 @@ const plans = [
 function ClientLandingPage() {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const reservationUrl = `${window.location.origin}/reservas`;
+  const reservationQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=12&data=${encodeURIComponent(reservationUrl)}`;
+  const whatsappUrl = `https://wa.me/56948882467?text=${encodeURIComponent(
+    'Hola, quiero hablar con DISCRET para reservar o recibir ayuda.'
+  )}`;
 
   const closeMenu = () => setIsMenuOpen(false);
+
+  const scrollToSection = (event: MouseEvent<HTMLAnchorElement>, href: string) => {
+    event.preventDefault();
+    closeMenu();
+
+    const target = document.querySelector(href);
+
+    if (!target) {
+      return;
+    }
+
+    const top = target.getBoundingClientRect().top + window.scrollY - 116;
+
+    window.scrollTo({
+      top,
+      behavior: 'smooth',
+    });
+
+    window.history.replaceState(null, '', href);
+  };
 
   const goToReservation = () => {
     closeMenu();
@@ -97,27 +122,27 @@ function ClientLandingPage() {
     >
       <div className="client-page-shade">
         <header className="client-navbar">
-          <a className="client-navbar-logo" href="#inicio" onClick={closeMenu}>
+          <a
+            className="client-navbar-logo"
+            href="#inicio"
+            onClick={(event) => scrollToSection(event, '#inicio')}
+          >
             <img src={discretLogo} alt="DISCRET" />
           </a>
 
           <nav className="client-desktop-nav" aria-label="Navegación principal">
-            {menuItems.slice(1, 5).map((item) => (
-              <a key={item.href} href={item.href}>
+            {menuItems.slice(1).map((item) => (
+              <a
+                key={item.href}
+                href={item.href}
+                onClick={(event) => scrollToSection(event, item.href)}
+              >
                 {item.label}
               </a>
             ))}
           </nav>
 
           <div className="client-navbar-actions">
-            <button
-              type="button"
-              className="client-admin-btn"
-              onClick={() => navigate('/login')}
-            >
-              Panel administrador
-            </button>
-
             <button
               type="button"
               className="client-menu-btn"
@@ -131,7 +156,11 @@ function ClientLandingPage() {
 
           <div className={`client-floating-menu ${isMenuOpen ? 'is-open' : ''}`}>
             {menuItems.map((item) => (
-              <a key={item.href} href={item.href} onClick={closeMenu}>
+              <a
+                key={item.href}
+                href={item.href}
+                onClick={(event) => scrollToSection(event, item.href)}
+              >
                 {item.label}
               </a>
             ))}
@@ -172,7 +201,11 @@ function ClientLandingPage() {
                 <span>Reservar ahora</span>
               </button>
 
-              <a className="client-ghost-link" href="#quienes-somos">
+              <a
+                className="client-ghost-link"
+                href="#quienes-somos"
+                onClick={(event) => scrollToSection(event, '#quienes-somos')}
+              >
                 Conocer DISCRET
               </a>
             </div>
@@ -329,6 +362,11 @@ function ClientLandingPage() {
           <div>
             <p className="client-kicker">Contacto</p>
             <h2>Conversemos</h2>
+
+            <a className="client-contact-qr" href="/reservas" aria-label="Reservar escaneando QR">
+              <span>QR para reservar</span>
+              <img src={reservationQrUrl} alt="QR para reservar en DISCRET" />
+            </a>
           </div>
 
           <div className="client-contact-list">
@@ -352,11 +390,21 @@ function ClientLandingPage() {
 
         <footer className="client-footer">
           <span>© 2026 DISCRET</span>
-          <strong>DISCRECIÓN • CONFORT • PRIVACIDAD</strong>
+          <strong>© 2026 Sistema de Reservas para Moteles</strong>
           <button type="button" onClick={() => navigate('/login')}>
             Panel administrador
           </button>
         </footer>
+
+        <a
+          className="client-whatsapp-float"
+          href={whatsappUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Hablar por WhatsApp con DISCRET"
+        >
+          <img src={whatsappIcon} alt="" aria-hidden="true" />
+        </a>
       </div>
     </main>
   );

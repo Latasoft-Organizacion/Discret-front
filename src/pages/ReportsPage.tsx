@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search } from 'lucide-react';
+import { BarChart3, CalendarDays, FileText, Search, WalletCards } from 'lucide-react';
 import AdminSidebar from '../components/AdminSidebar';
 import '../styles/adminSidebar.css';
 import '../styles/reports.css';
@@ -71,7 +71,9 @@ function ReportsPage() {
       {/* Resumen superior */}
       <section className="reports-summary">
         <article>
-          <span>💰</span>
+          <span className="reports-summary-icon pink">
+            <WalletCards size={22} strokeWidth={2.4} />
+          </span>
           <div>
             <strong>$3.850.000</strong>
             <p>Ingresos del mes</p>
@@ -79,7 +81,9 @@ function ReportsPage() {
         </article>
 
         <article>
-          <span>📅</span>
+          <span className="reports-summary-icon blue">
+            <CalendarDays size={22} strokeWidth={2.4} />
+          </span>
           <div>
             <strong>112</strong>
             <p>Reservas del mes</p>
@@ -87,7 +91,9 @@ function ReportsPage() {
         </article>
 
         <article>
-          <span>🛏️</span>
+          <span className="reports-summary-icon soft">
+            <BarChart3 size={22} strokeWidth={2.4} />
+          </span>
           <div>
             <strong>78%</strong>
             <p>Ocupación promedio</p>
@@ -95,7 +101,9 @@ function ReportsPage() {
         </article>
 
         <article>
-          <span>📊</span>
+          <span className="reports-summary-icon green">
+            <FileText size={22} strokeWidth={2.4} />
+          </span>
           <div>
             <strong>3</strong>
             <p>Reportes generados</p>
@@ -118,7 +126,9 @@ function ReportsPage() {
             className={`report-card ${report.status.toLowerCase()}`}
             key={report.id}
           >
-            <div className="report-icon">📄</div>
+            <div className="report-icon">
+              <FileText size={22} strokeWidth={2.4} />
+            </div>
 
             <div className="report-info">
               <h2>{report.title}</h2>

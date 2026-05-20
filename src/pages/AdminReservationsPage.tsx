@@ -6,7 +6,8 @@ import {
   Plus,
   Eye,
   Pencil,
-  Circle,
+  CheckCircle2,
+  Clock3,
   X,
 } from 'lucide-react';
 
@@ -210,7 +211,7 @@ function AdminReservationsPage() {
           {/* CONFIRMADAS */}
           <article>
             <div className="summary-icon green">
-              <Circle size={18} fill="currentColor" />
+              <CheckCircle2 size={24} strokeWidth={2.4} />
             </div>
 
             <div>
@@ -222,7 +223,7 @@ function AdminReservationsPage() {
           {/* PENDIENTES */}
           <article>
             <div className="summary-icon yellow">
-              <Circle size={18} fill="currentColor" />
+              <Clock3 size={24} strokeWidth={2.4} />
             </div>
 
             <div>
@@ -234,7 +235,7 @@ function AdminReservationsPage() {
           {/* TOTAL */}
           <article>
             <div className="summary-icon pink">
-              <Bed size={24} />
+              <Bed size={26} strokeWidth={2.4} />
             </div>
 
             <div>

@@ -62,22 +62,22 @@
   margin-left: 0;
 }
 
-.admin-brand h1 {
-  color: #ec4899;
-  letter-spacing: 2px;
-  font-size: 28px;
-  font-weight: 800;
-  line-height: 1;
+.admin-brand img {
+  width: 152px;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  filter:
+    drop-shadow(0 0 8px rgba(236, 72, 153, 0.72))
+    drop-shadow(0 0 18px rgba(236, 72, 153, 0.34));
 }
 
 .admin-brand p {
-  margin-top: 8px;
-
+  margin-top: 5px;
   font-size: 8px;
-
   color: #cbd5e1;
-
-  letter-spacing: 0.4px;
+  letter-spacing: 0.7px;
+  white-space: nowrap;
 }
 
 .admin-menu {

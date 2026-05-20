@@ -1,8 +1,188 @@
+import { useMemo, useState } from 'react';
+import { Bed, Bell, Building2, MessageCircle, ShieldCheck } from 'lucide-react';
 import AdminSidebar from '../components/AdminSidebar';
 import '../styles/adminSidebar.css';
 import '../styles/settings.css';
 
 function SettingsPage() {
+  const [whatsappSettings, setWhatsappSettings] = useState({
+    number: '+56 9 4888 2467',
+    status: 'Activo',
+    message: 'Hola, tu reserva ha sido registrada correctamente.',
+  });
+  const [reservationPolicies, setReservationPolicies] = useState({
+    arrivalTolerance: '15 minutos',
+    automaticCancellation: '20 minutos',
+    maxOccupationTime: '3 horas',
+    timeBetweenReservations: '30 minutos',
+  });
+  const [securitySettings, setSecuritySettings] = useState({
+    adminUser: 'Administrador',
+    adminEmail: 'admin@motel.com',
+    newPassword: '',
+    confirmPassword: '',
+  });
+  const [scheduleSettings, setScheduleSettings] = useState({
+    openingTime: '10:00',
+    closingTime: '23:59',
+    reservationDuration: '3 horas',
+    cleaningTime: '30 minutos',
+  });
+  const [motelData, setMotelData] = useState({
+    name: 'Discret',
+    contactEmail: 'admin@discret.cl',
+    phone: '+56 9 1234 5678',
+    address: 'Santiago, Chile',
+    businessName: 'Discret SpA',
+    taxId: '77.777.777-7',
+    city: 'Santiago',
+    region: 'Región Metropolitana',
+    supportEmail: 'discretchile@gmail.com',
+    website: 'www.discret.cl',
+  });
+  const [systemPreferences, setSystemPreferences] = useState({
+    darkMode: true,
+    notifications: true,
+    automaticConfirmation: false,
+    occupancyLock: true,
+    frequentClientPeriod: '3-meses',
+  });
+  const [saveMessage, setSaveMessage] = useState('');
+  const [settingsError, setSettingsError] = useState('');
+
+  const whatsappUrl = useMemo(() => {
+    const cleanNumber = whatsappSettings.number.replace(/\D/g, '');
+    const text = encodeURIComponent(whatsappSettings.message);
+
+    return cleanNumber ? `https://wa.me/${cleanNumber}?text=${text}` : '#';
+  }, [whatsappSettings.message, whatsappSettings.number]);
+
+  const updateWhatsappSetting = (field: keyof typeof whatsappSettings, value: string) => {
+    setWhatsappSettings((currentSettings) => ({
+      ...currentSettings,
+      [field]: value,
+    }));
+    setSaveMessage('');
+    setSettingsError('');
+  };
+
+  const updateReservationPolicy = (field: keyof typeof reservationPolicies, value: string) => {
+    setReservationPolicies((currentPolicies) => ({
+      ...currentPolicies,
+      [field]: value,
+    }));
+    setSaveMessage('');
+    setSettingsError('');
+  };
+
+  const updateSecuritySetting = (field: keyof typeof securitySettings, value: string) => {
+    setSecuritySettings((currentSettings) => ({
+      ...currentSettings,
+      [field]: value,
+    }));
+    setSaveMessage('');
+    setSettingsError('');
+  };
+
+  const updateScheduleSetting = (field: keyof typeof scheduleSettings, value: string) => {
+    setScheduleSettings((currentSettings) => ({
+      ...currentSettings,
+      [field]: value,
+    }));
+    setSaveMessage('');
+    setSettingsError('');
+  };
+
+  const updateMotelData = (field: keyof typeof motelData, value: string) => {
+    setMotelData((currentData) => ({
+      ...currentData,
+      [field]: value,
+    }));
+    setSaveMessage('');
+    setSettingsError('');
+  };
+
+  const toggleSystemPreference = (
+    field: Exclude<keyof typeof systemPreferences, 'frequentClientPeriod'>,
+  ) => {
+    setSystemPreferences((currentPreferences) => ({
+      ...currentPreferences,
+      [field]: !currentPreferences[field],
+    }));
+    setSaveMessage('');
+    setSettingsError('');
+  };
+
+  const updateFrequentClientPeriod = (value: string) => {
+    setSystemPreferences((currentPreferences) => ({
+      ...currentPreferences,
+      frequentClientPeriod: value,
+    }));
+    setSaveMessage('');
+    setSettingsError('');
+  };
+
+  const saveSettings = () => {
+    if (
+      securitySettings.newPassword
+      && securitySettings.newPassword !== securitySettings.confirmPassword
+    ) {
+      setSaveMessage('');
+      setSettingsError('Las contraseñas no coinciden.');
+      return;
+    }
+
+    setSettingsError('');
+    setSaveMessage('Configuración guardada correctamente.');
+  };
+
+  const undoSettings = () => {
+    setWhatsappSettings({
+      number: '+56 9 4888 2467',
+      status: 'Activo',
+      message: 'Hola, tu reserva ha sido registrada correctamente.',
+    });
+    setReservationPolicies({
+      arrivalTolerance: '15 minutos',
+      automaticCancellation: '20 minutos',
+      maxOccupationTime: '3 horas',
+      timeBetweenReservations: '30 minutos',
+    });
+    setSecuritySettings({
+      adminUser: 'Administrador',
+      adminEmail: 'admin@motel.com',
+      newPassword: '',
+      confirmPassword: '',
+    });
+    setScheduleSettings({
+      openingTime: '10:00',
+      closingTime: '23:59',
+      reservationDuration: '3 horas',
+      cleaningTime: '30 minutos',
+    });
+    setMotelData({
+      name: 'Discret',
+      contactEmail: 'admin@discret.cl',
+      phone: '+56 9 1234 5678',
+      address: 'Santiago, Chile',
+      businessName: 'Discret SpA',
+      taxId: '77.777.777-7',
+      city: 'Santiago',
+      region: 'Región Metropolitana',
+      supportEmail: 'discretchile@gmail.com',
+      website: 'www.discret.cl',
+    });
+    setSystemPreferences({
+      darkMode: true,
+      notifications: true,
+      automaticConfirmation: false,
+      occupancyLock: true,
+      frequentClientPeriod: '3-meses',
+    });
+    setSettingsError('');
+    setSaveMessage('Cambios deshechos correctamente.');
+  };
+
   return (
     <>
     <AdminSidebar active="configuracion" />
@@ -14,14 +194,14 @@ function SettingsPage() {
           <h1>Configuración</h1>
           <p>Ajustes generales del sistema de reservas</p>
         </div>
-
-        <button type="button">Guardar cambios</button>
       </header>
 
       {/* Resumen superior */}
       <section className="settings-summary">
         <article>
-          <span>🏨</span>
+          <span className="settings-summary-icon pink">
+            <Building2 size={22} strokeWidth={2.4} />
+          </span>
           <div>
             <strong>Discret</strong>
             <p>Nombre del sistema</p>
@@ -29,7 +209,9 @@ function SettingsPage() {
         </article>
 
         <article>
-          <span>🛏️</span>
+          <span className="settings-summary-icon blue">
+            <Bed size={22} strokeWidth={2.4} />
+          </span>
           <div>
             <strong>4</strong>
             <p>Habitaciones activas</p>
@@ -37,7 +219,9 @@ function SettingsPage() {
         </article>
 
         <article>
-          <span>🔔</span>
+          <span className="settings-summary-icon soft">
+            <Bell size={22} strokeWidth={2.4} />
+          </span>
           <div>
             <strong>Activo</strong>
             <p>Notificaciones</p>
@@ -45,7 +229,9 @@ function SettingsPage() {
         </article>
 
         <article>
-          <span>🛡️</span>
+          <span className="settings-summary-icon green">
+            <ShieldCheck size={22} strokeWidth={2.4} />
+          </span>
           <div>
             <strong>Admin</strong>
             <p>Rol actual</p>
@@ -64,21 +250,53 @@ function SettingsPage() {
   <div className="settings-form">
     <label>
       Número WhatsApp
-      <input type="text" defaultValue="+56 9 1234 5678" />
+      <input
+        type="tel"
+        value={whatsappSettings.number}
+        onChange={(event) => updateWhatsappSetting('number', event.target.value)}
+      />
     </label>
 
     <label>
       Estado
-      <input type="text" defaultValue="Activo" />
+      <select
+        value={whatsappSettings.status}
+        onChange={(event) => updateWhatsappSetting('status', event.target.value)}
+      >
+        <option value="Activo">Activo</option>
+        <option value="Inactivo">Inactivo</option>
+      </select>
     </label>
 
     <label className="full-width">
       Mensaje automático
       <input
         type="text"
-        defaultValue="Hola, tu reserva ha sido registrada correctamente."
+        value={whatsappSettings.message}
+        onChange={(event) => updateWhatsappSetting('message', event.target.value)}
       />
     </label>
+  </div>
+
+  <div className="settings-whatsapp-preview">
+    <span className="settings-whatsapp-icon">
+      <MessageCircle size={18} strokeWidth={2.5} />
+    </span>
+
+    <div>
+      <strong>Vista previa</strong>
+      <p>{whatsappSettings.message}</p>
+    </div>
+
+    <a
+      href={whatsappUrl}
+      target="_blank"
+      rel="noreferrer"
+      className={whatsappSettings.status === 'Activo' ? '' : 'disabled'}
+      aria-disabled={whatsappSettings.status !== 'Activo'}
+    >
+      Probar WhatsApp
+    </a>
   </div>
 </article>
 
@@ -90,23 +308,66 @@ function SettingsPage() {
   <div className="settings-form">
     <label>
       Tolerancia llegada
-      <input type="text" defaultValue="15 minutos" />
+      <select
+        value={reservationPolicies.arrivalTolerance}
+        onChange={(event) => updateReservationPolicy('arrivalTolerance', event.target.value)}
+      >
+        <option value="10 minutos">10 minutos</option>
+        <option value="15 minutos">15 minutos</option>
+        <option value="20 minutos">20 minutos</option>
+        <option value="30 minutos">30 minutos</option>
+      </select>
     </label>
 
     <label>
       Cancelación automática
-      <input type="text" defaultValue="20 minutos" />
+      <select
+        value={reservationPolicies.automaticCancellation}
+        onChange={(event) => updateReservationPolicy('automaticCancellation', event.target.value)}
+      >
+        <option value="15 minutos">15 minutos</option>
+        <option value="20 minutos">20 minutos</option>
+        <option value="30 minutos">30 minutos</option>
+        <option value="45 minutos">45 minutos</option>
+        <option value="1 hora">1 hora</option>
+      </select>
     </label>
 
     <label>
       Tiempo máximo ocupación
-      <input type="text" defaultValue="3 horas" />
+      <select
+        value={reservationPolicies.maxOccupationTime}
+        onChange={(event) => updateReservationPolicy('maxOccupationTime', event.target.value)}
+      >
+        <option value="2 horas">2 horas</option>
+        <option value="3 horas">3 horas</option>
+        <option value="4 horas">4 horas</option>
+        <option value="6 horas">6 horas</option>
+      </select>
     </label>
 
     <label>
       Tiempo entre reservas
-      <input type="text" defaultValue="30 minutos" />
+      <select
+        value={reservationPolicies.timeBetweenReservations}
+        onChange={(event) => updateReservationPolicy('timeBetweenReservations', event.target.value)}
+      >
+        <option value="15 minutos">15 minutos</option>
+        <option value="30 minutos">30 minutos</option>
+        <option value="45 minutos">45 minutos</option>
+        <option value="1 hora">1 hora</option>
+      </select>
     </label>
+  </div>
+
+  <div className="settings-policy-summary">
+    <strong>Resumen aplicado</strong>
+    <p>
+      Llegada con {reservationPolicies.arrivalTolerance} de tolerancia,
+      cancelación a los {reservationPolicies.automaticCancellation},
+      uso máximo de {reservationPolicies.maxOccupationTime} y
+      {reservationPolicies.timeBetweenReservations} entre reservas.
+    </p>
   </div>
 </article>
 
@@ -118,23 +379,103 @@ function SettingsPage() {
           <div className="settings-form">
             <label>
               Nombre del motel
-              <input type="text" defaultValue="Discret" />
+              <input
+                type="text"
+                value={motelData.name}
+                onChange={(event) => updateMotelData('name', event.target.value)}
+              />
             </label>
 
             <label>
               Correo de contacto
-              <input type="email" defaultValue="admin@discret.cl" />
+              <input
+                type="email"
+                value={motelData.contactEmail}
+                onChange={(event) => updateMotelData('contactEmail', event.target.value)}
+              />
             </label>
 
             <label>
               Teléfono
-              <input type="text" defaultValue="+56 9 1234 5678" />
+              <input
+                type="tel"
+                value={motelData.phone}
+                onChange={(event) => updateMotelData('phone', event.target.value)}
+              />
             </label>
 
             <label>
               Dirección
-              <input type="text" defaultValue="Santiago, Chile" />
+              <input
+                type="text"
+                value={motelData.address}
+                onChange={(event) => updateMotelData('address', event.target.value)}
+              />
             </label>
+
+            <label>
+              Razón social
+              <input
+                type="text"
+                value={motelData.businessName}
+                onChange={(event) => updateMotelData('businessName', event.target.value)}
+              />
+            </label>
+
+            <label>
+              RUT empresa
+              <input
+                type="text"
+                value={motelData.taxId}
+                onChange={(event) => updateMotelData('taxId', event.target.value)}
+              />
+            </label>
+
+            <label>
+              Ciudad
+              <input
+                type="text"
+                value={motelData.city}
+                onChange={(event) => updateMotelData('city', event.target.value)}
+              />
+            </label>
+
+            <label>
+              Región
+              <input
+                type="text"
+                value={motelData.region}
+                onChange={(event) => updateMotelData('region', event.target.value)}
+              />
+            </label>
+
+            <label>
+              Correo soporte
+              <input
+                type="email"
+                value={motelData.supportEmail}
+                onChange={(event) => updateMotelData('supportEmail', event.target.value)}
+              />
+            </label>
+
+            <label>
+              Sitio web
+              <input
+                type="text"
+                value={motelData.website}
+                onChange={(event) => updateMotelData('website', event.target.value)}
+              />
+            </label>
+          </div>
+
+          <div className="settings-policy-summary">
+            <strong>Ficha del motel</strong>
+            <p>
+              {motelData.name || 'Motel sin nombre'} opera en {motelData.city || 'ciudad pendiente'},
+              con contacto principal {motelData.contactEmail || 'sin correo'} y soporte
+              {' '}
+              {motelData.supportEmail || 'pendiente por completar'}.
+            </p>
           </div>
         </article>
 
@@ -146,23 +487,73 @@ function SettingsPage() {
           <div className="settings-options">
             <div>
               <span>Modo oscuro</span>
-              <button type="button" className="switch active">Activo</button>
+              <button
+                type="button"
+                className={`switch ${systemPreferences.darkMode ? 'active' : ''}`}
+                onClick={() => toggleSystemPreference('darkMode')}
+              >
+                {systemPreferences.darkMode ? 'Activo' : 'Inactivo'}
+              </button>
             </div>
 
             <div>
               <span>Notificaciones</span>
-              <button type="button" className="switch active">Activo</button>
+              <button
+                type="button"
+                className={`switch ${systemPreferences.notifications ? 'active' : ''}`}
+                onClick={() => toggleSystemPreference('notifications')}
+              >
+                {systemPreferences.notifications ? 'Activo' : 'Inactivo'}
+              </button>
             </div>
 
             <div>
               <span>Confirmación automática</span>
-              <button type="button" className="switch">Inactivo</button>
+              <button
+                type="button"
+                className={`switch ${systemPreferences.automaticConfirmation ? 'active' : ''}`}
+                onClick={() => toggleSystemPreference('automaticConfirmation')}
+              >
+                {systemPreferences.automaticConfirmation ? 'Activo' : 'Inactivo'}
+              </button>
             </div>
 
             <div>
               <span>Bloqueo por ocupación</span>
-              <button type="button" className="switch active">Activo</button>
+              <button
+                type="button"
+                className={`switch ${systemPreferences.occupancyLock ? 'active' : ''}`}
+                onClick={() => toggleSystemPreference('occupancyLock')}
+              >
+                {systemPreferences.occupancyLock ? 'Activo' : 'Inactivo'}
+              </button>
             </div>
+
+            <label className="settings-option-field">
+              Cliente frecuente cada
+              <select
+                value={systemPreferences.frequentClientPeriod}
+                onChange={(event) => updateFrequentClientPeriod(event.target.value)}
+              >
+                <option value="1-mes">1 mes</option>
+                <option value="2-meses">2 meses</option>
+                <option value="3-meses">3 meses</option>
+                <option value="6-meses">6 meses</option>
+                <option value="1-ano">1 año</option>
+                <option value="siempre">Siempre que tenga visitas</option>
+              </select>
+            </label>
+          </div>
+
+          <div className="settings-policy-summary">
+            <strong>Preferencias activas</strong>
+            <p>
+              Modo oscuro {systemPreferences.darkMode ? 'activo' : 'inactivo'},
+              notificaciones {systemPreferences.notifications ? 'activas' : 'inactivas'},
+              confirmación automática {systemPreferences.automaticConfirmation ? 'activa' : 'inactiva'}
+              {' '}
+              y bloqueo por ocupación {systemPreferences.occupancyLock ? 'activo' : 'inactivo'}.
+            </p>
           </div>
         </article>
 
@@ -174,23 +565,54 @@ function SettingsPage() {
           <div className="settings-form">
             <label>
               Usuario administrador
-              <input type="text" defaultValue="Administrador" />
+              <input
+                type="text"
+                value={securitySettings.adminUser}
+                onChange={(event) => updateSecuritySetting('adminUser', event.target.value)}
+              />
             </label>
 
             <label>
               Correo administrador
-              <input type="email" defaultValue="admin@motel.com" />
+              <input
+                type="email"
+                value={securitySettings.adminEmail}
+                onChange={(event) => updateSecuritySetting('adminEmail', event.target.value)}
+              />
             </label>
 
             <label>
               Nueva contraseña
-              <input type="password" placeholder="••••••••" />
+              <input
+                type="password"
+                value={securitySettings.newPassword}
+                onChange={(event) => updateSecuritySetting('newPassword', event.target.value)}
+                placeholder="••••••••"
+              />
             </label>
 
             <label>
               Confirmar contraseña
-              <input type="password" placeholder="••••••••" />
+              <input
+                type="password"
+                value={securitySettings.confirmPassword}
+                onChange={(event) => updateSecuritySetting('confirmPassword', event.target.value)}
+                placeholder="••••••••"
+              />
             </label>
+          </div>
+
+          <div className="settings-policy-summary">
+            <strong>Acceso configurado</strong>
+            <p>
+              Usuario {securitySettings.adminUser || 'sin nombre'} con correo
+              {' '}
+              {securitySettings.adminEmail || 'pendiente por completar'}.
+              {' '}
+              {securitySettings.newPassword
+                ? 'La contraseña se actualizará al guardar.'
+                : 'La contraseña actual se mantiene sin cambios.'}
+            </p>
           </div>
         </article>
 
@@ -202,26 +624,78 @@ function SettingsPage() {
           <div className="settings-form">
             <label>
               Hora apertura
-              <input type="time" defaultValue="10:00" />
+              <input
+                type="time"
+                value={scheduleSettings.openingTime}
+                onChange={(event) => updateScheduleSetting('openingTime', event.target.value)}
+              />
             </label>
 
             <label>
               Hora cierre
-              <input type="time" defaultValue="23:59" />
+              <input
+                type="time"
+                value={scheduleSettings.closingTime}
+                onChange={(event) => updateScheduleSetting('closingTime', event.target.value)}
+              />
             </label>
 
             <label>
               Duración reserva
-              <input type="text" defaultValue="3 horas" />
+              <select
+                value={scheduleSettings.reservationDuration}
+                onChange={(event) => updateScheduleSetting('reservationDuration', event.target.value)}
+              >
+                <option value="2 horas">2 horas</option>
+                <option value="3 horas">3 horas</option>
+                <option value="4 horas">4 horas</option>
+                <option value="6 horas">6 horas</option>
+              </select>
             </label>
 
             <label>
               Tiempo de limpieza
-              <input type="text" defaultValue="30 minutos" />
+              <select
+                value={scheduleSettings.cleaningTime}
+                onChange={(event) => updateScheduleSetting('cleaningTime', event.target.value)}
+              >
+                <option value="15 minutos">15 minutos</option>
+                <option value="30 minutos">30 minutos</option>
+                <option value="45 minutos">45 minutos</option>
+                <option value="1 hora">1 hora</option>
+              </select>
             </label>
+          </div>
+
+          <div className="settings-policy-summary">
+            <strong>Horario operativo</strong>
+            <p>
+              Atención desde {scheduleSettings.openingTime} hasta {scheduleSettings.closingTime},
+              reservas de {scheduleSettings.reservationDuration} y
+              {' '}
+              {scheduleSettings.cleaningTime} para limpieza entre usos.
+            </p>
           </div>
         </article>
 
+      </section>
+
+      <section className="settings-actions-bar" aria-label="Acciones de configuración">
+        <div>
+          <strong>Guardar configuración</strong>
+          <p>Aplica o descarta los cambios realizados en esta página.</p>
+          {saveMessage && <span className="settings-save-message">{saveMessage}</span>}
+          {settingsError && <span className="settings-error-message">{settingsError}</span>}
+        </div>
+
+        <div className="settings-actions-buttons">
+          <button type="button" className="settings-undo-button" onClick={undoSettings}>
+            Deshacer cambios
+          </button>
+          <button type="button" className="settings-save-button" onClick={saveSettings}>
+            Guardar cambios
+          </button>
+        </div>
       </section>
 
     </main>

@@ -1,13 +1,16 @@
 import { useState } from 'react';
-import { Search } from 'lucide-react';
+import { CalendarDays, CheckCircle2, Clock3, Search, Sparkles } from 'lucide-react';
 import AdminSidebar from '../components/AdminSidebar';
 import '../styles/adminSidebar.css';
 import '../styles/agenda.css';
+
+type AgendaFilter = 'Hoy' | 'Reservas' | 'Limpieza' | 'Pendientes';
 
 function AgendaPage() {
 
   // Estado modal nuevo evento
   const [showModal, setShowModal] = useState(false);
+  const [activeFilter, setActiveFilter] = useState<AgendaFilter>('Hoy');
 
   // Datos simulados de agenda
   const agenda = [
@@ -16,6 +19,28 @@ function AgendaPage() {
     { id: 3, hour: '18:00', type: 'Reserva', room: 'Hab. 107', client: 'Carlos Rojas', status: 'Confirmada' },
     { id: 4, hour: '20:30', type: 'Limpieza', room: 'Hab. 103', client: 'Personal limpieza', status: 'Pendiente' },
   ];
+
+  const agendaFilters: AgendaFilter[] = ['Hoy', 'Reservas', 'Limpieza', 'Pendientes'];
+
+  const filteredAgenda = agenda.filter((item) => {
+    if (activeFilter === 'Hoy') {
+      return true;
+    }
+
+    if (activeFilter === 'Reservas') {
+      return item.type === 'Reserva';
+    }
+
+    if (activeFilter === 'Limpieza') {
+      return item.type === 'Limpieza';
+    }
+
+    return item.status === 'Pendiente';
+  });
+
+  const confirmedCount = agenda.filter((item) => item.status === 'Confirmada').length;
+  const cleaningCount = agenda.filter((item) => item.type === 'Limpieza').length;
+  const pendingCount = agenda.filter((item) => item.status === 'Pendiente').length;
 
   return (
     <>
@@ -58,37 +83,45 @@ function AgendaPage() {
       <section className="agenda-summary">
 
         <article>
-          <span>📅</span>
+          <span className="agenda-summary-icon pink">
+            <CalendarDays size={22} strokeWidth={2.4} />
+          </span>
 
           <div>
-            <strong>4</strong>
+            <strong>{agenda.length}</strong>
             <p>Eventos hoy</p>
           </div>
         </article>
 
         <article>
-          <span>✅</span>
+          <span className="agenda-summary-icon green">
+            <CheckCircle2 size={22} strokeWidth={2.4} />
+          </span>
 
           <div>
-            <strong>2</strong>
+            <strong>{confirmedCount}</strong>
             <p>Confirmados</p>
           </div>
         </article>
 
         <article>
-          <span>🧹</span>
+          <span className="agenda-summary-icon soft">
+            <Sparkles size={22} strokeWidth={2.4} />
+          </span>
 
           <div>
-            <strong>1</strong>
+            <strong>{cleaningCount}</strong>
             <p>Limpieza</p>
           </div>
         </article>
 
         <article>
-          <span>⏳</span>
+          <span className="agenda-summary-icon blue">
+            <Clock3 size={22} strokeWidth={2.4} />
+          </span>
 
           <div>
-            <strong>1</strong>
+            <strong>{pendingCount}</strong>
             <p>Pendientes</p>
           </div>
         </article>
@@ -98,17 +131,23 @@ function AgendaPage() {
       {/* Filtros */}
       <section className="agenda-filters">
 
-        <button className="active">Hoy</button>
-        <button>Reservas</button>
-        <button>Limpieza</button>
-        <button>Pendientes</button>
+        {agendaFilters.map((filter) => (
+          <button
+            key={filter}
+            type="button"
+            className={activeFilter === filter ? 'active' : ''}
+            onClick={() => setActiveFilter(filter)}
+          >
+            {filter}
+          </button>
+        ))}
 
       </section>
 
       {/* Listado agenda */}
       <section className="agenda-list">
 
-        {agenda.map((item) => (
+        {filteredAgenda.map((item) => (
 
           <article
             className={`agenda-card ${item.status.toLowerCase()}`}
@@ -141,6 +180,12 @@ function AgendaPage() {
           </article>
 
         ))}
+
+        {filteredAgenda.length === 0 && (
+          <div className="agenda-empty-state">
+            No hay eventos para este filtro.
+          </div>
+        )}
 
       </section>
 

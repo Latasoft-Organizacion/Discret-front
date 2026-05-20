@@ -364,10 +364,19 @@ form label {
 }
 
 /* Link recuperar contraseña */
-.login-options a {
+.forgot-password-btn {
+  border: none;
+  background: transparent;
   color: #f472b6;
-  text-decoration: none;
+  font: inherit;
   font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s ease, text-shadow 0.2s ease;
+}
+
+.forgot-password-btn:hover {
+  color: #ff4fa3;
+  text-shadow: 0 0 12px rgba(236, 72, 153, 0.62);
 }
 
 /* Boton login */
@@ -415,6 +424,97 @@ form label {
 .login-footer p:last-child {
   font-size: 12px;
   opacity: 0.8;
+}
+
+.recovery-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(3, 7, 18, 0.72);
+  backdrop-filter: blur(10px);
+}
+
+.recovery-modal {
+  position: relative;
+  width: min(100%, 430px);
+  padding: 34px;
+  border: 1px solid rgba(236, 72, 153, 0.28);
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at top, rgba(236, 72, 153, 0.14), transparent 48%),
+    rgba(20, 26, 39, 0.96);
+  box-shadow:
+    0 26px 70px rgba(0, 0, 0, 0.48),
+    0 0 42px rgba(236, 72, 153, 0.16);
+  text-align: center;
+}
+
+.recovery-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(236, 72, 153, 0.28);
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.76);
+  color: #ff4fa3;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.recovery-icon {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 22px;
+  border: 2px solid rgba(236, 72, 153, 0.72);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ff4fa3;
+  box-shadow:
+    0 0 24px rgba(236, 72, 153, 0.38),
+    inset 0 0 18px rgba(236, 72, 153, 0.08);
+}
+
+.recovery-modal h2 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 26px;
+}
+
+.recovery-modal p {
+  margin: 14px 0 24px;
+  color: #cbd5e1;
+  line-height: 1.6;
+}
+
+.recovery-form {
+  text-align: left;
+}
+
+.recovery-submit {
+  width: 100%;
+  min-height: 56px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #ec4899, #db2777);
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 14px 32px rgba(236, 72, 153, 0.3);
 }
 
 /* =========================

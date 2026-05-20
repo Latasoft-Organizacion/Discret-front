@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { CalendarDays, Clock3, Users } from 'lucide-react';
 
 import ReservationSuccessModal from '../components/ReservationSuccessModal';
 
@@ -10,6 +11,37 @@ type ReservationData = {
   roomType: string;
   selectedHour: string;
   date: string;
+};
+
+const getCheckoutHour = (selectedHour: string) => {
+  const match = selectedHour.trim().match(/^(\d{1,2}):(\d{2})\s*(am|pm)$/i);
+
+  if (!match) {
+    return 'Por confirmar';
+  }
+
+  const [, hourValue, minuteValue, periodValue] = match;
+  const period = periodValue.toLowerCase();
+  let hour = Number(hourValue);
+  const minute = Number(minuteValue);
+
+  if (period === 'pm' && hour !== 12) {
+    hour += 12;
+  }
+
+  if (period === 'am' && hour === 12) {
+    hour = 0;
+  }
+
+  const checkout = new Date(2026, 0, 1, hour, minute);
+  checkout.setHours(checkout.getHours() + 3);
+
+  const formattedHour = checkout.getHours();
+  const displayPeriod = formattedHour >= 12 ? 'pm' : 'am';
+  const displayHour = formattedHour % 12 || 12;
+  const displayMinute = checkout.getMinutes().toString().padStart(2, '0');
+
+  return `${displayHour}:${displayMinute} ${displayPeriod}`;
 };
 
 function ConfirmReservationPage() {
@@ -32,6 +64,7 @@ function ConfirmReservationPage() {
 
   // Estado modal éxito
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const checkoutHour = getCheckoutHour(reservation?.selectedHour ?? '');
 
 
   // Si no existen datos de reserva
@@ -149,7 +182,9 @@ function ConfirmReservationPage() {
 
           <article>
 
-            <span>👤</span>
+            <span className="confirm-summary-icon">
+              <Users size={26} strokeWidth={2.3} />
+            </span>
 
             <strong>
               {reservation.people}{' '}
@@ -160,7 +195,9 @@ function ConfirmReservationPage() {
 
           <article>
 
-            <span>📅</span>
+            <span className="confirm-summary-icon">
+              <CalendarDays size={26} strokeWidth={2.3} />
+            </span>
 
             <strong>
               {reservation.date}
@@ -170,7 +207,9 @@ function ConfirmReservationPage() {
 
           <article>
 
-            <span>🕒</span>
+            <span className="confirm-summary-icon">
+              <Clock3 size={26} strokeWidth={2.3} />
+            </span>
 
             <strong>
               {reservation.selectedHour}
@@ -317,6 +356,34 @@ function ConfirmReservationPage() {
               </div>
 
 
+              {/* Horario entrada */}
+              <div>
+
+                <span>
+                  Horario de entrada
+                </span>
+
+                <strong>
+                  {reservation.selectedHour}
+                </strong>
+
+              </div>
+
+
+              {/* Horario salida */}
+              <div>
+
+                <span>
+                  Horario de salida
+                </span>
+
+                <strong>
+                  {checkoutHour}
+                </strong>
+
+              </div>
+
+
               {/* Cliente */}
               <div>
 
@@ -428,6 +495,14 @@ function ConfirmReservationPage() {
 
       <ReservationSuccessModal
         isOpen={showSuccessModal}
+        reservation={reservation}
+        checkoutHour={checkoutHour}
+        client={{
+          name,
+          lastName,
+          phone,
+          email,
+        }}
       />
 
     </main>

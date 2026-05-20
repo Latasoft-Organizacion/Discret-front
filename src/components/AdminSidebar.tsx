@@ -14,6 +14,8 @@ import {
   PanelLeftOpen,
 } from 'lucide-react';
 
+import discretLogo from '../assets/images/logo-discret.png';
+
 type Props = {
   active: string;
 };
@@ -44,7 +46,7 @@ function AdminSidebar({ active }: Props) {
       {/* LOGO */}
       <div className="admin-brand">
 
-        <h1>DISCRET</h1>
+        <img src={discretLogo} alt="DISCRET" />
 
         <p>
           DISCRECIÓN · CONFORT · PRIVACIDAD
