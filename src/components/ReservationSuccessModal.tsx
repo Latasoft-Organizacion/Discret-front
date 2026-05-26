@@ -52,7 +52,13 @@ function ReservationSuccessModal({
   const mailToClient = `mailto:${client.email}?subject=${mailSubject}&body=${mailBody}`;
 
   return (
-    <div className="success-modal-overlay">
+    <div
+      className="success-modal-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="success-title"
+      aria-describedby="success-description"
+    >
       <div className="success-modal-card">
         <div className="success-glow"></div>
 
@@ -66,8 +72,8 @@ function ReservationSuccessModal({
         </div>
 
         <div className="success-content">
-          <h2>¡Reserva confirmada!</h2>
-          <p>Tu habitación ha sido reservada correctamente.</p>
+          <h2 id="success-title">¡Reserva confirmada!</h2>
+          <p id="success-description">Tu habitación ha sido reservada correctamente.</p>
           <strong>¡Te esperamos!</strong>
         </div>
 
@@ -136,6 +142,7 @@ function ReservationSuccessModal({
         <button
           type="button"
           className="success-home-btn"
+          aria-label="Volver al inicio de DISCRET"
           onClick={() => navigate('/')}
         >
           Volver al inicio

@@ -363,3 +363,69 @@
     width: 156px;
   }
 }
+
+@media (max-width: 420px) {
+  .success-modal-overlay {
+    padding: 12px;
+  }
+
+  .success-modal-card {
+    width: 100%;
+    padding: 28px 16px;
+    border-radius: 18px;
+  }
+
+  .success-check-circle {
+    width: 78px;
+    height: 78px;
+    font-size: 36px;
+  }
+
+  .success-logo h1 {
+    font-size: 32px;
+    letter-spacing: 5px;
+  }
+
+  .success-content h2 {
+    font-size: 25px;
+    line-height: 1.18;
+  }
+
+  .success-content p,
+  .success-info-item,
+  .success-access-copy p {
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  .success-access-pass,
+  .success-info-box {
+    padding: 16px;
+    border-radius: 14px;
+  }
+
+  .success-access-details div {
+    padding: 14px;
+  }
+
+  .success-email-btn,
+  .success-home-btn {
+    min-height: 52px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 360px) {
+  .success-logo h1 {
+    font-size: 28px;
+    letter-spacing: 4px;
+  }
+
+  .success-content h2 {
+    font-size: 23px;
+  }
+
+  .success-qr-frame {
+    width: 138px;
+  }
+}

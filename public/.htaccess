@@ -1,0 +1,8 @@
+Options -MultiViews
+
+RewriteEngine On
+RewriteBase /discret/
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /discret/index.html [L]

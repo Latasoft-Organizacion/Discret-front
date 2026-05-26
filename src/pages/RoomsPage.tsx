@@ -12,6 +12,9 @@ import {
   X,
 } from 'lucide-react';
 
+import AdminBreadcrumb from '../components/AdminBreadcrumb';
+import { AdminSkeleton } from '../components/AdminLoading';
+import AdminToast from '../components/AdminToast';
 import AdminSidebar from '../components/AdminSidebar';
 
 import '../styles/adminSidebar.css';
@@ -30,6 +33,16 @@ function RoomsPage() {
   // Estado para mostrar u ocultar el modal
   const [showModal, setShowModal] = useState(false);
   const [activeFilter, setActiveFilter] = useState<RoomFilter>('Todas');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [modalMessage, setModalMessage] = useState('');
+  const [toastMessage, setToastMessage] = useState('');
+  const isLoading = false;
+  const [newRoom, setNewRoom] = useState<Room>({
+    number: 109,
+    type: '',
+    status: 'Disponible',
+    price: '',
+  });
   const [editingRoom, setEditingRoom] = useState<Room | null>(null);
   const [editingRoomNumber, setEditingRoomNumber] = useState<number | null>(null);
   const [detailRoom, setDetailRoom] = useState<Room | null>(null);
@@ -49,10 +62,17 @@ function RoomsPage() {
     { label: 'Limpieza', value: 'Limpieza' },
   ];
 
-  const filteredRooms =
-    activeFilter === 'Todas'
-      ? rooms
-      : rooms.filter((room) => room.status === activeFilter);
+  const filteredRooms = rooms.filter((room) => {
+    const matchesFilter = activeFilter === 'Todas' || room.status === activeFilter;
+    const normalizedSearch = searchTerm.trim().toLowerCase();
+    const matchesSearch =
+      !normalizedSearch
+      || String(room.number).includes(normalizedSearch)
+      || room.type.toLowerCase().includes(normalizedSearch)
+      || room.status.toLowerCase().includes(normalizedSearch);
+
+    return matchesFilter && matchesSearch;
+  });
 
   const availableRooms = rooms.filter((room) => room.status === 'Disponible').length;
   const occupiedRooms = rooms.filter((room) => room.status === 'Ocupada').length;
@@ -66,7 +86,7 @@ function RoomsPage() {
     }
 
     if (!editingRoom.number || !editingRoom.type || !editingRoom.price || !editingRoom.status) {
-      alert('Completa todos los campos de la habitación.');
+      setModalMessage('Completa todos los campos de la habitación antes de guardar.');
       return;
     }
 
@@ -78,6 +98,33 @@ function RoomsPage() {
 
     setEditingRoom(null);
     setEditingRoomNumber(null);
+    setModalMessage('');
+    setToastMessage(`Habitación ${editingRoom.number} actualizada correctamente.`);
+  };
+
+  const handleCreateRoom = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!newRoom.number || !newRoom.type || !newRoom.price || !newRoom.status) {
+      setModalMessage('Completa número, tipo, precio y estado para crear la habitación.');
+      return;
+    }
+
+    if (rooms.some((room) => room.number === newRoom.number)) {
+      setModalMessage('Ya existe una habitación con ese número.');
+      return;
+    }
+
+    setRooms((currentRooms) => [...currentRooms, newRoom]);
+    setNewRoom({
+      number: newRoom.number + 1,
+      type: '',
+      status: 'Disponible',
+      price: '',
+    });
+    setModalMessage('');
+    setShowModal(false);
+    setToastMessage(`Habitación ${newRoom.number} creada correctamente.`);
   };
 
   return (
@@ -89,6 +136,7 @@ function RoomsPage() {
       <section className="rooms-admin-main">
         <header className="rooms-top">
           <div>
+            <AdminBreadcrumb current="Habitaciones" />
             <h1>Habitaciones</h1>
             <p>Gestión y estado actual de habitaciones</p>
           </div>
@@ -96,10 +144,16 @@ function RoomsPage() {
           <div className="rooms-top-actions">
             <div className="rooms-search">
               <Search size={18} />
-              <input type="text" placeholder="Buscar habitación..." />
+              <input
+                type="text"
+                aria-label="Buscar habitación"
+                placeholder="Buscar habitación..."
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+              />
             </div>
 
-            <button type="button" onClick={() => setShowModal(true)}>
+            <button type="button" aria-label="Crear nueva habitación" onClick={() => setShowModal(true)}>
               <Plus size={18} />
               Nueva habitación
             </button>
@@ -107,6 +161,10 @@ function RoomsPage() {
         </header>
 
         {/* Resumen rápido superior */}
+        {isLoading ? (
+          <AdminSkeleton variant="summary" count={4} label="Cargando resumen de habitaciones" />
+        ) : (
+        <>
         <section className="rooms-summary">
           <article>
             <div className="rooms-summary-icon green">
@@ -160,16 +218,23 @@ function RoomsPage() {
               key={filter.value}
               type="button"
               className={activeFilter === filter.value ? 'active' : ''}
+              aria-pressed={activeFilter === filter.value}
               onClick={() => setActiveFilter(filter.value)}
             >
               {filter.label}
             </button>
           ))}
         </section>
+        </>
+        )}
 
         {/* Listado de habitaciones */}
-        <section className="rooms-list">
-          {filteredRooms.map((room) => (
+        <section className="rooms-list" aria-busy={isLoading}>
+          {isLoading && (
+            <AdminSkeleton variant="card" count={4} label="Cargando habitaciones" />
+          )}
+
+          {!isLoading && filteredRooms.map((room) => (
             <article
               className={`room-detail-card ${room.status.toLowerCase()}`}
               key={room.number}
@@ -200,7 +265,11 @@ function RoomsPage() {
                   Editar
                 </button>
 
-                <button type="button" onClick={() => setDetailRoom(room)}>
+                <button
+                  type="button"
+                  aria-label={`Ver detalle de habitación ${room.number}`}
+                  onClick={() => setDetailRoom(room)}
+                >
                   <Eye size={16} />
                   Ver detalle
                 </button>
@@ -208,9 +277,14 @@ function RoomsPage() {
             </article>
           ))}
 
-          {filteredRooms.length === 0 && (
-            <div className="rooms-empty-state">
-              No hay habitaciones para este estado.
+          {!isLoading && filteredRooms.length === 0 && (
+            <div className="admin-empty-state">
+              <div>
+                <strong>No hay habitaciones para mostrar</strong>
+                <p>
+                  Ajusta el filtro o prueba con otro número, tipo o estado de habitación.
+                </p>
+              </div>
             </div>
           )}
         </section>
@@ -218,38 +292,81 @@ function RoomsPage() {
 
       {/* Modal nueva habitación */}
       {showModal && (
-        <div className="room-modal-overlay">
+        <div
+          className="room-modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="room-create-title"
+        >
           <div className="room-modal">
             <div className="room-modal-header">
               <div>
-                <h2>Nueva habitación</h2>
+                <h2 id="room-create-title">Nueva habitación</h2>
                 <p>Registra una nueva habitación en el sistema.</p>
               </div>
 
-              <button type="button" onClick={() => setShowModal(false)}>
+              <button
+                type="button"
+                aria-label="Cerrar modal de nueva habitación"
+                onClick={() => {
+                  setModalMessage('');
+                  setShowModal(false);
+                }}
+              >
                 <X size={20} />
               </button>
             </div>
 
-            <form className="room-modal-form">
+            <form className="room-modal-form" onSubmit={handleCreateRoom}>
+              {modalMessage && <p className="admin-modal-message">{modalMessage}</p>}
+
               <label>
                 Número habitación
-                <input type="text" placeholder="Ej: 109" />
+                <input
+                  type="number"
+                  placeholder="Ej: 109"
+                  value={newRoom.number}
+                  onChange={(event) =>
+                    setNewRoom((room) => ({ ...room, number: Number(event.target.value) }))
+                  }
+                />
               </label>
 
               <label>
                 Tipo habitación
-                <input type="text" placeholder="Ej: Suite premium" />
+                <input
+                  type="text"
+                  placeholder="Ej: Suite premium"
+                  value={newRoom.type}
+                  onChange={(event) =>
+                    setNewRoom((room) => ({ ...room, type: event.target.value }))
+                  }
+                />
               </label>
 
               <label>
                 Precio
-                <input type="text" placeholder="$35.000" />
+                <input
+                  type="text"
+                  placeholder="$35.000"
+                  value={newRoom.price}
+                  onChange={(event) =>
+                    setNewRoom((room) => ({ ...room, price: event.target.value }))
+                  }
+                />
               </label>
 
               <label>
                 Estado
-                <select defaultValue="Disponible">
+                <select
+                  value={newRoom.status}
+                  onChange={(event) =>
+                    setNewRoom((room) => ({
+                      ...room,
+                      status: event.target.value as Room['status'],
+                    }))
+                  }
+                >
                   <option>Disponible</option>
                   <option>Ocupada</option>
                   <option>Limpieza</option>
@@ -257,7 +374,13 @@ function RoomsPage() {
               </label>
 
               <div className="room-modal-actions">
-                <button type="button" onClick={() => setShowModal(false)}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setModalMessage('');
+                    setShowModal(false);
+                  }}
+                >
                   Cancelar
                 </button>
 
@@ -271,19 +394,26 @@ function RoomsPage() {
       )}
 
       {editingRoom && (
-        <div className="room-modal-overlay">
+        <div
+          className="room-modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="room-edit-title"
+        >
           <div className="room-modal">
             <div className="room-modal-header">
               <div>
-                <h2>Editar habitación</h2>
+                <h2 id="room-edit-title">Editar habitación</h2>
                 <p>Actualiza los datos principales de la habitación.</p>
               </div>
 
               <button
                 type="button"
+                aria-label="Cerrar modal de edición de habitación"
                 onClick={() => {
                   setEditingRoom(null);
                   setEditingRoomNumber(null);
+                  setModalMessage('');
                 }}
               >
                 <X size={20} />
@@ -291,6 +421,8 @@ function RoomsPage() {
             </div>
 
             <form className="room-modal-form" onSubmit={handleUpdateRoom}>
+              {modalMessage && <p className="admin-modal-message">{modalMessage}</p>}
+
               <label>
                 Número habitación
                 <input
@@ -354,6 +486,7 @@ function RoomsPage() {
                   onClick={() => {
                     setEditingRoom(null);
                     setEditingRoomNumber(null);
+                    setModalMessage('');
                   }}
                 >
                   Cancelar
@@ -369,15 +502,24 @@ function RoomsPage() {
       )}
 
       {detailRoom && (
-        <div className="room-modal-overlay">
+        <div
+          className="room-modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="room-detail-title"
+        >
           <div className="room-modal">
             <div className="room-modal-header">
               <div>
-                <h2>Detalle habitación</h2>
+                <h2 id="room-detail-title">Detalle habitación</h2>
                 <p>Información operativa de la habitación seleccionada.</p>
               </div>
 
-              <button type="button" onClick={() => setDetailRoom(null)}>
+              <button
+                type="button"
+                aria-label="Cerrar detalle de habitación"
+                onClick={() => setDetailRoom(null)}
+              >
                 <X size={20} />
               </button>
             </div>
@@ -410,6 +552,11 @@ function RoomsPage() {
           </div>
         </div>
       )}
+
+      <AdminToast
+        message={toastMessage}
+        onClose={() => setToastMessage('')}
+      />
     </main>
   );
 }

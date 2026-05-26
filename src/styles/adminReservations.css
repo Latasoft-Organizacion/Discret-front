@@ -286,6 +286,11 @@
   border: 1px solid rgba(148, 163, 184, 0.1);
 }
 
+.admin-table-empty {
+  min-width: calc(100% - 28px);
+  margin: 14px;
+}
+
 .table-header,
 .table-row {
   min-width: 1280px;

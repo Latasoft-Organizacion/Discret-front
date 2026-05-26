@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 // Páginas públicas
 import ClientLandingPage from '../pages/ClientLandingPage';
+import ClientRegisterPage from '../pages/ClientRegisterPage';
 import ConfirmReservationPage from '../pages/ConfirmReservationPage';
 
 // Páginas administrativas
@@ -18,10 +19,11 @@ import SettingsPage from '../pages/SettingsPage';
 
 function AppRouter() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/discret">
       <Routes>
         {/* Landing pública cliente */}
         <Route path="/" element={<ClientLandingPage />} />
+        <Route path="/registro" element={<ClientRegisterPage />} />
 
         {/* Formulario de reserva cliente */}
         <Route path="/reservas-admin" element={<AdminReservationsPage />} />

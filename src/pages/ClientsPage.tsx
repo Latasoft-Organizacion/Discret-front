@@ -8,6 +8,9 @@ import {
   UserRoundPlus,
   X,
 } from 'lucide-react';
+import AdminBreadcrumb from '../components/AdminBreadcrumb';
+import { AdminSkeleton } from '../components/AdminLoading';
+import AdminToast from '../components/AdminToast';
 import AdminSidebar from '../components/AdminSidebar';
 import '../styles/adminSidebar.css';
 import '../styles/clients.css';
@@ -29,6 +32,10 @@ function ClientsPage() {
   // Página actual de la tabla
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [activeFilter, setActiveFilter] = useState<ClientFilter>('Todos');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [modalMessage, setModalMessage] = useState('');
+  const [toastMessage, setToastMessage] = useState('');
+  const isLoading = false;
   const [showClientModal, setShowClientModal] = useState(false);
   const [newClient, setNewClient] = useState({
     name: '',
@@ -53,6 +60,18 @@ function ClientsPage() {
   const clientFilters: ClientFilter[] = ['Todos', 'Frecuentes', 'Nuevos', 'Activos'];
 
   const filteredClients = clients.filter((client) => {
+    const normalizedSearch = searchTerm.trim().toLowerCase();
+    const matchesSearch =
+      !normalizedSearch
+      || client.name.toLowerCase().includes(normalizedSearch)
+      || client.phone.toLowerCase().includes(normalizedSearch)
+      || client.email.toLowerCase().includes(normalizedSearch)
+      || client.frequentRoom.toLowerCase().includes(normalizedSearch);
+
+    if (!matchesSearch) {
+      return false;
+    }
+
     if (activeFilter === 'Todos') {
       return true;
     }
@@ -72,7 +91,7 @@ function ClientsPage() {
     event.preventDefault();
 
     if (!newClient.name || !newClient.phone || !newClient.email || !newClient.frequentRoom) {
-      alert('Completa nombre, teléfono, correo y habitación frecuente para crear el cliente.');
+      setModalMessage('Completa nombre, teléfono, correo y habitación frecuente para crear el cliente.');
       return;
     }
 
@@ -97,8 +116,10 @@ function ClientsPage() {
       frequentRoom: '',
       status: 'Nuevo',
     });
+    setModalMessage('');
     setCurrentPage(1);
     setShowClientModal(false);
+    setToastMessage(`Cliente ${newClient.name} creado correctamente.`);
   };
 
   const handleUpdateClient = (event: React.FormEvent<HTMLFormElement>) => {
@@ -109,7 +130,7 @@ function ClientsPage() {
     }
 
     if (!editingClient.name || !editingClient.phone || !editingClient.email || !editingClient.frequentRoom) {
-      alert('Completa nombre, teléfono, correo y habitación frecuente.');
+      setModalMessage('Completa nombre, teléfono, correo y habitación frecuente.');
       return;
     }
 
@@ -120,6 +141,8 @@ function ClientsPage() {
     );
 
     setEditingClient(null);
+    setModalMessage('');
+    setToastMessage(`Cliente ${editingClient.name} actualizado correctamente.`);
   };
 
   // Total de páginas
@@ -139,6 +162,7 @@ function ClientsPage() {
 
       <header className="clients-top">
         <div>
+          <AdminBreadcrumb current="Clientes" />
           <h1>Clientes</h1>
           <p>Gestión de contactos y clientes frecuentes</p>
         </div>
@@ -160,6 +184,11 @@ function ClientsPage() {
     <input
       type="text"
       placeholder="Buscar cliente..."
+      value={searchTerm}
+      onChange={(event) => {
+        setSearchTerm(event.target.value);
+        setCurrentPage(1);
+      }}
     />
 
   </div>
@@ -183,6 +212,9 @@ function ClientsPage() {
       </header>
 
      {/* Resumen superior */}
+{isLoading ? (
+  <AdminSkeleton variant="summary" count={4} label="Cargando resumen de clientes" />
+) : (
 <section className="clients-summary">
 
   {/* Total clientes */}
@@ -251,6 +283,7 @@ function ClientsPage() {
   </article>
 
 </section>
+)}
       {/* Filtros rápidos */}
       <section className="clients-filters">
         {clientFilters.map((filter) => (
@@ -269,8 +302,12 @@ function ClientsPage() {
       </section>
 
       {/* Listado de clientes */}
-      <section className="clients-list">
-        {visibleClients.map((client) => (
+      <section className="clients-list" aria-busy={isLoading}>
+        {isLoading && (
+          <AdminSkeleton variant="card" count={4} label="Cargando clientes" />
+        )}
+
+        {!isLoading && visibleClients.map((client) => (
           <article
             className={`client-card ${client.status.toLowerCase()}`}
             key={client.id}
@@ -315,9 +352,12 @@ function ClientsPage() {
           </article>
         ))}
 
-        {visibleClients.length === 0 && (
-          <div className="clients-empty-state">
-            No hay clientes para este filtro.
+        {!isLoading && visibleClients.length === 0 && (
+          <div className="admin-empty-state">
+            <div>
+              <strong>No hay clientes para mostrar</strong>
+              <p>Prueba con otro filtro, nombre, correo, teléfono o habitación frecuente.</p>
+            </div>
           </div>
         )}
       </section>
@@ -362,12 +402,20 @@ function ClientsPage() {
                 <p>Registra un cliente para el panel administrativo.</p>
               </div>
 
-              <button type="button" onClick={() => setShowClientModal(false)}>
+              <button
+                type="button"
+                onClick={() => {
+                  setModalMessage('');
+                  setShowClientModal(false);
+                }}
+              >
                 <X size={20} />
               </button>
             </div>
 
             <form className="client-modal-form" onSubmit={handleCreateClient}>
+              {modalMessage && <p className="admin-modal-message">{modalMessage}</p>}
+
               <label>
                 Nombre
                 <input
@@ -445,7 +493,13 @@ function ClientsPage() {
               </label>
 
               <div className="client-modal-actions">
-                <button type="button" onClick={() => setShowClientModal(false)}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setModalMessage('');
+                    setShowClientModal(false);
+                  }}
+                >
                   Cancelar
                 </button>
 
@@ -467,12 +521,20 @@ function ClientsPage() {
                 <p>Actualiza los datos registrados del cliente.</p>
               </div>
 
-              <button type="button" onClick={() => setEditingClient(null)}>
+              <button
+                type="button"
+                onClick={() => {
+                  setModalMessage('');
+                  setEditingClient(null);
+                }}
+              >
                 <X size={20} />
               </button>
             </div>
 
             <form className="client-modal-form" onSubmit={handleUpdateClient}>
+              {modalMessage && <p className="admin-modal-message">{modalMessage}</p>}
+
               <label>
                 Nombre
                 <input
@@ -543,7 +605,13 @@ function ClientsPage() {
               </label>
 
               <div className="client-modal-actions">
-                <button type="button" onClick={() => setEditingClient(null)}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setModalMessage('');
+                    setEditingClient(null);
+                  }}
+                >
                   Cancelar
                 </button>
 
@@ -609,6 +677,11 @@ function ClientsPage() {
           </div>
         </div>
       )}
+
+      <AdminToast
+        message={toastMessage}
+        onClose={() => setToastMessage('')}
+      />
     </main>
     </>
   );

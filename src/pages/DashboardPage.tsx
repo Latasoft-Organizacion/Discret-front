@@ -11,6 +11,8 @@ import {
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import AdminBreadcrumb from '../components/AdminBreadcrumb';
+import AdminToast from '../components/AdminToast';
 import AdminSidebar from '../components/AdminSidebar';
 
 import '../styles/adminSidebar.css';
@@ -19,6 +21,7 @@ import '../styles/dashboard.css';
 function DashboardPage() {
   const navigate = useNavigate();
   const [quickReservationMessage, setQuickReservationMessage] = useState('');
+  const [quickReservationModalMessage, setQuickReservationModalMessage] = useState('');
   const [showQuickReservationModal, setShowQuickReservationModal] = useState(false);
   const [showBlockRoomModal, setShowBlockRoomModal] = useState(false);
   const [showDailyReportModal, setShowDailyReportModal] = useState(false);
@@ -51,6 +54,7 @@ function DashboardPage() {
   ]);
 
   const createQuickReservation = () => {
+    setQuickReservationModalMessage('');
     setShowQuickReservationModal(true);
     return;
 
@@ -114,7 +118,7 @@ function DashboardPage() {
     event.preventDefault();
 
     if (!quickReservation.client || !quickReservation.room || !quickReservation.entry || !quickReservation.exit) {
-      alert('Completa cliente, habitación, entrada y salida para crear la reserva rápida.');
+      setQuickReservationModalMessage('Completa cliente, habitación, entrada y salida para crear la reserva rápida.');
       return;
     }
 
@@ -146,6 +150,12 @@ function DashboardPage() {
       entry: '',
       exit: '',
     });
+    setQuickReservationModalMessage('');
+    setShowQuickReservationModal(false);
+  };
+
+  const closeQuickReservationModal = () => {
+    setQuickReservationModalMessage('');
     setShowQuickReservationModal(false);
   };
 
@@ -172,6 +182,7 @@ function DashboardPage() {
       <section className="dashboard-main">
         <header className="dashboard-header">
           <div>
+            <AdminBreadcrumb current="Dashboard" />
             <h2>Bienvenido, Administrador 👋</h2>
             <p>Panel de administración</p>
           </div>
@@ -257,11 +268,6 @@ function DashboardPage() {
               ＋ Nueva reserva rápida
             </button>
 
-            {quickReservationMessage && (
-              <p className="quick-reservation-feedback">
-                {quickReservationMessage}
-              </p>
-            )}
           </article>
 
           <article className="panel reservations-panel">
@@ -331,12 +337,18 @@ function DashboardPage() {
                 <p>Selecciona cliente, habitación y horario sin salir del dashboard.</p>
               </div>
 
-              <button type="button" onClick={() => setShowQuickReservationModal(false)}>
+              <button type="button" onClick={closeQuickReservationModal}>
                 <X size={20} />
               </button>
             </div>
 
             <form className="dashboard-modal-form" onSubmit={handleCreateQuickReservation}>
+              {quickReservationModalMessage && (
+                <p className="admin-modal-message dashboard-modal-full">
+                  {quickReservationModalMessage}
+                </p>
+              )}
+
               <label>
                 Cliente
                 <input
@@ -400,7 +412,7 @@ function DashboardPage() {
               </label>
 
               <div className="dashboard-modal-actions">
-                <button type="button" onClick={() => setShowQuickReservationModal(false)}>
+                <button type="button" onClick={closeQuickReservationModal}>
                   Cancelar
                 </button>
 
@@ -504,6 +516,11 @@ function DashboardPage() {
           </section>
         </div>
       )}
+
+      <AdminToast
+        message={quickReservationMessage}
+        onClose={() => setQuickReservationMessage('')}
+      />
     </main>
   );
 }

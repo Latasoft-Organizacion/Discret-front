@@ -15,6 +15,7 @@ function ReservationsPage() {
 
   // Horario seleccionado
   const [selectedHour, setSelectedHour] = useState('');
+  const [validationMessage, setValidationMessage] = useState('');
 
   // Tipos de habitación disponibles
   const roomTypes = [
@@ -50,7 +51,7 @@ function ReservationsPage() {
     event.preventDefault();
 
     if (!people || !roomType || !selectedHour) {
-      alert('Debes seleccionar cantidad de personas, habitación y horario.');
+      setValidationMessage('Debes seleccionar cantidad de personas, habitación y horario.');
       return;
     }
 
@@ -114,7 +115,10 @@ function ReservationsPage() {
                   type="button"
                   key={number}
                   className={people === number ? 'active' : ''}
-                  onClick={() => setPeople(number)}
+                  onClick={() => {
+                    setPeople(number);
+                    setValidationMessage('');
+                  }}
                 >
                   <UserRound size={22} strokeWidth={2.4} />
 
@@ -134,7 +138,10 @@ function ReservationsPage() {
 
             <select
               value={roomType}
-              onChange={(event) => setRoomType(event.target.value)}
+              onChange={(event) => {
+                setRoomType(event.target.value);
+                setValidationMessage('');
+              }}
             >
               <option value="">Selecciona el tipo de habitación</option>
 
@@ -160,7 +167,10 @@ function ReservationsPage() {
                   type="button"
                   key={hour}
                   className={selectedHour === hour ? 'active' : ''}
-                  onClick={() => setSelectedHour(hour)}
+                  onClick={() => {
+                    setSelectedHour(hour);
+                    setValidationMessage('');
+                  }}
                 >
                   {hour}
                 </button>
@@ -168,6 +178,12 @@ function ReservationsPage() {
             </div>
           </div>
         </section>
+
+        {validationMessage && (
+          <p className="client-reservation-message">
+            {validationMessage}
+          </p>
+        )}
 
         {/* Botones inferiores */}
         <section className="client-reservation-actions">

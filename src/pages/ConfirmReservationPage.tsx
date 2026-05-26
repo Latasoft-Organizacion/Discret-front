@@ -61,6 +61,7 @@ function ConfirmReservationPage() {
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [comment, setComment] = useState('');
+  const [validationMessage, setValidationMessage] = useState('');
 
   // Estado modal éxito
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -111,10 +112,12 @@ function ConfirmReservationPage() {
     // Validación básica
     if (!name || !lastName || !phone || !email) {
 
-      alert('Debes completar los datos del cliente.');
+      setValidationMessage('Debes completar nombre, apellido, teléfono y correo electrónico.');
 
       return;
     }
+
+    setValidationMessage('');
 
     // Abre modal animado
     setShowSuccessModal(true);
@@ -240,6 +243,12 @@ function ConfirmReservationPage() {
               Datos del cliente
             </h3>
 
+            {validationMessage && (
+              <p className="confirm-validation-message">
+                {validationMessage}
+              </p>
+            )}
+
             <div className="confirm-client-grid">
 
 
@@ -252,7 +261,10 @@ function ConfirmReservationPage() {
                   type="text"
                   placeholder="Ingrese nombre"
                   value={name}
-                  onChange={(event) => setName(event.target.value)}
+                  onChange={(event) => {
+                    setName(event.target.value);
+                    setValidationMessage('');
+                  }}
                 />
 
               </label>
@@ -267,7 +279,10 @@ function ConfirmReservationPage() {
                   type="text"
                   placeholder="Ingrese apellido"
                   value={lastName}
-                  onChange={(event) => setLastName(event.target.value)}
+                  onChange={(event) => {
+                    setLastName(event.target.value);
+                    setValidationMessage('');
+                  }}
                 />
 
               </label>
@@ -288,7 +303,10 @@ function ConfirmReservationPage() {
                     type="tel"
                     placeholder="Ingrese celular"
                     value={phone}
-                    onChange={(event) => setPhone(event.target.value)}
+                    onChange={(event) => {
+                      setPhone(event.target.value);
+                      setValidationMessage('');
+                    }}
                   />
 
                 </div>
@@ -305,7 +323,10 @@ function ConfirmReservationPage() {
                   type="email"
                   placeholder="ejemplo@correo.com"
                   value={email}
-                  onChange={(event) => setEmail(event.target.value)}
+                  onChange={(event) => {
+                    setEmail(event.target.value);
+                    setValidationMessage('');
+                  }}
                 />
 
               </label>

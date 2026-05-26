@@ -1,4 +1,4 @@
-import { type MouseEvent, useState } from 'react';
+import { type MouseEvent, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Bed,
@@ -61,11 +61,85 @@ const plans = [
 function ClientLandingPage() {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const reservationUrl = `${window.location.origin}/reservas`;
+  const reservationUrl = 'https://latasoft.cl/discret/reservas';
   const reservationQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=12&data=${encodeURIComponent(reservationUrl)}`;
   const whatsappUrl = `https://wa.me/56948882467?text=${encodeURIComponent(
     'Hola, quiero hablar con DISCRET para reservar o recibir ayuda.'
   )}`;
+
+  useEffect(() => {
+    const revealElements = document.querySelectorAll<HTMLElement>('.client-reveal');
+
+    if (!revealElements.length) {
+      return undefined;
+    }
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (prefersReducedMotion) {
+      revealElements.forEach((element) => element.classList.add('is-visible'));
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        threshold: 0.16,
+        rootMargin: '0px 0px -8% 0px',
+      }
+    );
+
+    revealElements.forEach((element) => observer.observe(element));
+
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const pageElement = document.querySelector<HTMLElement>('.client-landing-page');
+
+    if (!pageElement) {
+      return undefined;
+    }
+
+    let animationFrame = 0;
+
+    const updateBackgroundFade = () => {
+      const maxFadeDistance = Math.max(
+        document.documentElement.scrollHeight - window.innerHeight,
+        1
+      );
+      const fadeAmount = Math.min(window.scrollY / maxFadeDistance, 1);
+
+      pageElement.style.setProperty('--client-scroll-fade', fadeAmount.toFixed(3));
+      animationFrame = 0;
+    };
+
+    const requestFadeUpdate = () => {
+      if (!animationFrame) {
+        animationFrame = window.requestAnimationFrame(updateBackgroundFade);
+      }
+    };
+
+    updateBackgroundFade();
+    window.addEventListener('scroll', requestFadeUpdate, { passive: true });
+    window.addEventListener('resize', requestFadeUpdate);
+
+    return () => {
+      window.removeEventListener('scroll', requestFadeUpdate);
+      window.removeEventListener('resize', requestFadeUpdate);
+
+      if (animationFrame) {
+        window.cancelAnimationFrame(animationFrame);
+      }
+    };
+  }, []);
 
   const closeMenu = () => setIsMenuOpen(false);
 
@@ -94,6 +168,16 @@ function ClientLandingPage() {
     navigate('/reservas');
   };
 
+  const goToRegister = () => {
+    closeMenu();
+    navigate('/registro');
+  };
+
+  const goToLogin = () => {
+    closeMenu();
+    navigate('/login');
+  };
+
   const requestPlan = (planName: string) => {
     const message = encodeURIComponent(
       `Hola, quiero solicitar el ${planName} de DISCRET.`
@@ -113,8 +197,8 @@ function ClientLandingPage() {
         backgroundImage: `
           linear-gradient(
             90deg,
-            rgba(5, 8, 15, 0.18),
-            rgba(5, 8, 15, 0.93)
+            rgba(5, 8, 15, 0),
+            rgba(5, 8, 15, 0.24)
           ),
           url(${motelLogin})
         `,
@@ -143,6 +227,16 @@ function ClientLandingPage() {
           </nav>
 
           <div className="client-navbar-actions">
+            <button type="button" className="client-auth-btn" onClick={goToLogin}>
+              Iniciar sesión
+            </button>
+            <button
+              type="button"
+              className="client-auth-btn is-primary"
+              onClick={goToRegister}
+            >
+              Registrarse
+            </button>
             <button
               type="button"
               className="client-menu-btn"
@@ -165,13 +259,17 @@ function ClientLandingPage() {
               </a>
             ))}
 
-            <button type="button" onClick={goToReservation}>
-              Reservar ahora
+            <button type="button" className="client-floating-secondary-btn" onClick={goToLogin}>
+              Iniciar sesión
+            </button>
+
+            <button type="button" onClick={goToRegister}>
+              Registrarse
             </button>
           </div>
         </header>
 
-        <section id="inicio" className="client-hero-section">
+        <section id="inicio" className="client-hero-section client-reveal">
           <div className="client-hero-copy">
             <p className="client-kicker">Gestión moderna para hospitality privado</p>
             <h1>DISCRET</h1>
@@ -223,7 +321,7 @@ function ClientLandingPage() {
           </aside>
         </section>
 
-        <section id="quienes-somos" className="client-section client-about-section">
+        <section id="quienes-somos" className="client-section client-about-section client-reveal">
           <div className="client-section-heading">
             <p className="client-kicker">¿Quiénes Somos?</p>
             <h2>Diseñamos tecnología para modernizar la gestión privada</h2>
@@ -244,27 +342,27 @@ function ClientLandingPage() {
           </div>
         </section>
 
-        <section id="beneficios" className="client-section client-benefits-grid">
-          <article>
+        <section id="beneficios" className="client-section client-benefits-grid client-reveal">
+          <article className="client-reveal">
             <ShieldCheck size={28} strokeWidth={2.2} />
             <h3>Discreción garantizada</h3>
             <p>Flujos privados y una experiencia pensada para reducir fricción.</p>
           </article>
 
-          <article>
+          <article className="client-reveal">
             <Clock3 size={28} strokeWidth={2.2} />
             <h3>Reservas en minutos</h3>
             <p>Disponibilidad, horarios y confirmación reunidos en un solo lugar.</p>
           </article>
 
-          <article>
+          <article className="client-reveal">
             <LockKeyhole size={28} strokeWidth={2.2} />
             <h3>Operación protegida</h3>
             <p>Datos ordenados, acceso simple y control desde cualquier dispositivo.</p>
           </article>
         </section>
 
-        <section className="client-section client-brand-story-section">
+        <section className="client-section client-brand-story-section client-reveal">
           <div className="client-brand-story-panel">
             <p className="client-kicker">Lo que representa DISCRET</p>
             <h2>Reservas privadas, automatización y pagos digitales para la industria motelera</h2>
@@ -282,10 +380,9 @@ function ClientLandingPage() {
           </div>
         </section>
 
-        <section id="planes" className="client-section client-plans-section">
+        <section id="planes" className="client-section client-plans-section client-reveal">
           <div className="client-section-heading client-plans-heading">
             <p className="client-kicker">Planes comerciales</p>
-            <h2>Elige el plan que mejor calza con tu operación</h2>
             <p>
               Valores mensuales diseñados para digitalizar reservas, habitaciones y
               administración sin complejidad.
@@ -296,7 +393,7 @@ function ClientLandingPage() {
             {plans.map((plan) => (
               <article
                 key={plan.name}
-                className={`client-plan-card ${plan.highlighted ? 'is-featured' : ''}`}
+                className={`client-plan-card client-reveal ${plan.highlighted ? 'is-featured' : ''}`}
                 role="button"
                 tabIndex={0}
                 onClick={() => requestPlan(plan.name)}
@@ -342,7 +439,7 @@ function ClientLandingPage() {
           </p>
         </section>
 
-        <section id="reservar" className="client-section client-cta-section">
+        <section id="reservar" className="client-section client-cta-section client-reveal">
           <div>
             <p className="client-kicker">Listo para avanzar</p>
             <h2>Haz que cada reserva sea más rápida, clara y confidencial.</h2>
@@ -358,12 +455,12 @@ function ClientLandingPage() {
           </button>
         </section>
 
-        <section id="contacto" className="client-section client-contact-section">
+        <section id="contacto" className="client-section client-contact-section client-reveal">
           <div>
             <p className="client-kicker">Contacto</p>
             <h2>Conversemos</h2>
 
-            <a className="client-contact-qr" href="/reservas" aria-label="Reservar escaneando QR">
+            <a className="client-contact-qr" href={reservationUrl} aria-label="Reservar escaneando QR">
               <span>QR para reservar</span>
               <img src={reservationQrUrl} alt="QR para reservar en DISCRET" />
             </a>
@@ -391,9 +488,14 @@ function ClientLandingPage() {
         <footer className="client-footer">
           <span>© 2026 DISCRET</span>
           <strong>© 2026 Sistema de Reservas para Moteles</strong>
-          <button type="button" onClick={() => navigate('/login')}>
-            Panel administrador
-          </button>
+          <div className="client-footer-actions" aria-label="Acceso de usuarios">
+            <button type="button" onClick={goToLogin}>
+              Iniciar sesión
+            </button>
+            <button type="button" className="client-footer-primary-btn" onClick={goToRegister}>
+              Registrarse
+            </button>
+          </div>
         </footer>
 
         <a

@@ -123,6 +123,414 @@
   backdrop-filter: blur(14px);
 }
 
+.client-reservation-message {
+  max-width: 1180px;
+  margin: 0 auto 24px;
+  padding: 14px 16px;
+  border: 1px solid rgba(236, 72, 153, 0.32);
+  border-radius: 14px;
+  background: rgba(236, 72, 153, 0.1);
+  color: #ffd7eb;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.client-reservation-message.is-success {
+  border-color: rgba(34, 197, 94, 0.35);
+  background: rgba(34, 197, 94, 0.1);
+  color: #bbf7d0;
+}
+
+.client-register-page {
+  display: block;
+}
+
+.client-register-logo {
+  margin-top: 36px;
+}
+
+.client-register-shell {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(280px, 0.78fr) minmax(0, 1.22fr);
+  gap: 28px;
+  align-items: stretch;
+}
+
+.client-register-copy {
+  padding: 34px;
+  border: 1px solid rgba(236, 72, 153, 0.18);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 0 0, rgba(236, 72, 153, 0.14), transparent 36%),
+    rgba(15, 23, 42, 0.64);
+  box-shadow: 0 22px 50px rgba(0, 0, 0, 0.22);
+}
+
+.client-register-kicker {
+  margin: 0 0 14px;
+  color: #ff4fa3;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  text-shadow: 0 0 14px rgba(236, 72, 153, 0.68);
+}
+
+.client-register-copy h1 {
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(30px, 4vw, 48px);
+  line-height: 1.08;
+}
+
+.client-register-copy > p:not(.client-register-kicker) {
+  margin: 18px 0 0;
+  color: #cbd5e1;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.client-register-benefits {
+  margin-top: 28px;
+  display: grid;
+  gap: 12px;
+}
+
+.client-register-benefits span {
+  min-height: 46px;
+  padding: 0 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(236, 72, 153, 0.18);
+  border-radius: 12px;
+  background: rgba(8, 13, 24, 0.6);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.client-register-benefits svg,
+.client-input-icon svg {
+  color: #ff4fa3;
+  filter: drop-shadow(0 0 8px rgba(236, 72, 153, 0.5));
+}
+
+.client-register-card {
+  margin-bottom: 0;
+  padding: 30px;
+}
+
+.client-register-card .client-form-group {
+  color: #e2e8f0;
+  font-size: 15px;
+  font-weight: 800;
+  gap: 9px;
+}
+
+.client-register-card .client-form-group + .client-form-group {
+  margin-top: 0;
+}
+
+.client-register-card .client-form-group > span:not(.client-input-icon) {
+  color: #ff4fa3;
+}
+
+.client-register-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #e2e8f0;
+  line-height: 1.2;
+}
+
+.client-register-label strong {
+  color: #ff4fa3;
+}
+
+.client-register-card .client-form-grid {
+  gap: 18px 26px;
+  align-items: start;
+}
+
+.client-input-icon {
+  position: relative;
+  display: block;
+}
+
+.client-input-icon svg {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  z-index: 1;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.client-register-check {
+  margin-top: 24px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid rgba(236, 72, 153, 0.22);
+  border-radius: 14px;
+  background: rgba(8, 13, 24, 0.58);
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.client-register-warning {
+  margin-top: 24px;
+  padding: 16px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  border: 1px solid rgba(236, 72, 153, 0.24);
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at 0 0, rgba(236, 72, 153, 0.12), transparent 42%),
+    rgba(8, 13, 24, 0.66);
+  color: #dbeafe;
+}
+
+.client-register-warning svg {
+  margin-top: 2px;
+  color: #ff4fa3;
+  filter: drop-shadow(0 0 8px rgba(236, 72, 153, 0.5));
+}
+
+.client-register-warning p {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.55;
+}
+
+.client-register-check input {
+  width: 20px;
+  height: 20px;
+  accent-color: #ec4899;
+}
+
+.client-register-actions {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: 0.82fr 1.18fr;
+  gap: 14px;
+}
+
+.client-register-actions .cancel-reservation-btn,
+.client-register-actions .save-reservation-btn {
+  width: 100%;
+}
+
+.client-register-login-callout {
+  margin-top: 18px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 1px solid rgba(236, 72, 153, 0.22);
+  border-radius: 12px;
+  background: rgba(8, 13, 24, 0.58);
+  color: #cbd5e1;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.client-register-login-callout button {
+  border: none;
+  background: transparent;
+  color: #ff4fa3;
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+  text-shadow: 0 0 10px rgba(236, 72, 153, 0.42);
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.client-register-login-callout button:hover {
+  color: #ff7fbd;
+  transform: translateY(-1px);
+}
+
+.client-register-success {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  padding: 18px;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(236, 72, 153, 0.22), transparent 34%),
+    rgba(3, 7, 18, 0.76);
+  backdrop-filter: blur(12px);
+  animation: register-success-fade 0.28s ease both;
+}
+
+.client-register-success-card {
+  position: relative;
+  width: min(100%, 460px);
+  padding: 38px 30px 30px;
+  display: grid;
+  gap: 22px;
+  overflow: hidden;
+  text-align: center;
+  border: 1px solid rgba(236, 72, 153, 0.28);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at top, rgba(236, 72, 153, 0.16), transparent 42%),
+    rgba(15, 23, 42, 0.92);
+  box-shadow:
+    0 28px 72px rgba(0, 0, 0, 0.48),
+    inset 0 0 34px rgba(236, 72, 153, 0.06);
+  animation: register-success-rise 0.42s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+}
+
+.client-register-success-glow {
+  position: absolute;
+  top: -92px;
+  left: 50%;
+  width: 220px;
+  height: 220px;
+  border-radius: 999px;
+  background: rgba(236, 72, 153, 0.18);
+  filter: blur(28px);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.client-register-success-check {
+  width: 112px;
+  height: 112px;
+  margin: 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ec4899, #db2777);
+  color: #ffffff;
+  box-shadow:
+    0 0 28px rgba(236, 72, 153, 0.7),
+    0 18px 46px rgba(236, 72, 153, 0.28);
+  animation: register-check-pulse 1.45s ease-in-out infinite;
+}
+
+.client-register-success-logo h2 {
+  margin: 0;
+  color: #ff4fa3;
+  font-size: 42px;
+  font-weight: 300;
+  letter-spacing: 10px;
+  text-shadow:
+    0 0 8px rgba(236, 72, 153, 0.9),
+    0 0 24px rgba(236, 72, 153, 0.62);
+}
+
+.client-register-success-logo p {
+  margin: 10px 0 0;
+  color: #f8fafc;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 3px;
+}
+
+.client-register-success-copy h3 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 30px;
+  line-height: 1.15;
+}
+
+.client-register-success-copy p {
+  margin: 12px 0 0;
+  color: #cbd5e1;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.client-register-success-copy strong {
+  display: block;
+  margin-top: 12px;
+  color: #ff4fa3;
+  font-size: 19px;
+}
+
+.client-register-success-info {
+  padding: 18px;
+  display: grid;
+  gap: 12px;
+  border: 1px solid rgba(236, 72, 153, 0.22);
+  border-radius: 16px;
+  background: rgba(236, 72, 153, 0.08);
+}
+
+.client-register-success-info span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.client-register-success-info svg {
+  color: #ff4fa3;
+  filter: drop-shadow(0 0 8px rgba(236, 72, 153, 0.55));
+}
+
+.client-register-success-actions {
+  display: grid;
+  gap: 12px;
+}
+
+.client-register-success-actions .save-reservation-btn,
+.client-register-success-actions .cancel-reservation-btn {
+  width: 100%;
+  height: 58px;
+}
+
+@keyframes register-success-fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes register-success-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes register-check-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.06);
+  }
+}
+
 /* ========================================
    GRUPOS FORMULARIO
 ======================================== */
@@ -192,6 +600,19 @@
 .client-form-group textarea:focus {
   border-color: #ec4899;
   box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.12);
+}
+
+.client-register-card .client-input-icon input {
+  padding-left: 58px;
+}
+
+.client-register-card .client-input-icon input[type="date"] {
+  color-scheme: dark;
+}
+
+.client-register-card .client-input-icon svg {
+  width: 18px;
+  height: 18px;
 }
 
 /* ========================================
@@ -500,6 +921,34 @@
     grid-template-columns: 1fr;
   }
 
+  .client-register-shell {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .client-register-copy {
+    padding: 24px;
+    text-align: center;
+  }
+
+  .client-register-card .client-form-grid {
+    gap: 16px;
+  }
+
+  .client-register-benefits {
+    justify-items: center;
+  }
+
+  .client-register-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .client-register-login-callout {
+    flex-direction: column;
+    gap: 6px;
+    text-align: center;
+  }
+
   .client-form-group label {
     font-size: 14px;
   }
@@ -575,22 +1024,172 @@
   }
 }
 
+@media (min-width: 640px) and (max-width: 900px) {
+  .client-reservation-page {
+    padding: 26px 22px;
+  }
+
+  .client-reservation-card,
+  .client-reservation-message {
+    max-width: 680px;
+  }
+
+  .client-form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .client-form-group.full {
+    grid-column: 1 / -1;
+  }
+
+  .available-hours-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 420px) {
+  .client-reservation-page {
+    padding: 18px 10px;
+  }
+
+  .client-reservation-title h1 {
+    font-size: 25px;
+    line-height: 1.15;
+  }
+
+  .client-reservation-title p {
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
   .client-reservation-logo h2 {
-    font-size: 38px;
-    letter-spacing: 7px;
+    font-size: 34px;
+    letter-spacing: 5px;
   }
 
   .client-reservation-logo p {
     font-size: 10px;
-    letter-spacing: 3px;
+    letter-spacing: 2px;
+    line-height: 1.6;
   }
 
   .client-reservation-card {
-    padding: 18px 14px;
+    padding: 18px 12px;
+    border-radius: 15px;
+  }
+
+  .client-register-logo {
+    margin-top: 22px;
+  }
+
+  .client-register-copy {
+    padding: 20px 14px;
+  }
+
+  .client-register-copy h1 {
+    font-size: 26px;
+  }
+
+  .client-register-copy > p:not(.client-register-kicker) {
+    font-size: 14px;
+  }
+
+  .client-register-check {
+    align-items: flex-start;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  .client-register-warning {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .client-register-success-card {
+    padding: 30px 18px 22px;
+    border-radius: 18px;
+  }
+
+  .client-register-success-check {
+    width: 86px;
+    height: 86px;
+  }
+
+  .client-register-success-logo h2 {
+    font-size: 32px;
+    letter-spacing: 6px;
+  }
+
+  .client-register-success-logo p {
+    font-size: 9px;
+    letter-spacing: 2px;
+    line-height: 1.6;
+  }
+
+  .client-register-success-copy h3 {
+    font-size: 25px;
+  }
+
+  .client-register-success-info {
+    padding: 15px;
+  }
+
+  .people-options {
+    gap: 8px;
+  }
+
+  .people-options button {
+    height: 58px;
+    padding: 0 6px;
+  }
+
+  .people-options button span {
+    font-size: 11px;
   }
 
   .available-hours-grid {
     max-height: 224px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .available-hours-grid button {
+    height: 48px;
+    font-size: 13px;
+  }
+
+  .client-reservation-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .cancel-reservation-btn,
+  .save-reservation-btn {
+    height: 52px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 360px) {
+  .client-reservation-logo h2 {
+    font-size: 30px;
+    letter-spacing: 4px;
+  }
+
+  .client-reservation-card {
+    padding: 16px 10px;
+  }
+
+  .people-options button {
+    gap: 5px;
+  }
+
+  .people-options button svg {
+    min-width: 16px;
+    min-height: 16px;
+  }
+
+  .hours-title strong {
+    font-size: 12px;
+    letter-spacing: 3px;
   }
 }

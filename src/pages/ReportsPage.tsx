@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import { BarChart3, CalendarDays, FileText, Search, WalletCards } from 'lucide-react';
+import AdminBreadcrumb from '../components/AdminBreadcrumb';
+import { AdminSkeleton } from '../components/AdminLoading';
+import AdminToast from '../components/AdminToast';
 import AdminSidebar from '../components/AdminSidebar';
 import '../styles/adminSidebar.css';
 import '../styles/reports.css';
@@ -7,6 +10,11 @@ import '../styles/reports.css';
 function ReportsPage() {
   // Estado para abrir o cerrar el modal de generar reporte
   const [showModal, setShowModal] = useState(false);
+  const [activeFilter, setActiveFilter] = useState('Todos');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [modalMessage, setModalMessage] = useState('');
+  const [toastMessage, setToastMessage] = useState('');
+  const isLoading = false;
 
   // Estados del formulario del modal
   const [reportType, setReportType] = useState('');
@@ -21,12 +29,35 @@ function ReportsPage() {
     { id: 3, title: 'Reporte mensual', date: '01/05/2026', amount: '$3.850.000', reservations: 112, status: 'Generado' },
   ];
 
+  const reportFilters = ['Todos', 'Diarios', 'Semanales', 'Mensuales'];
+
+  const filteredReports = reports.filter((report) => {
+    const normalizedSearch = searchTerm.trim().toLowerCase();
+    const matchesSearch =
+      !normalizedSearch
+      || report.title.toLowerCase().includes(normalizedSearch)
+      || report.date.toLowerCase().includes(normalizedSearch)
+      || report.amount.toLowerCase().includes(normalizedSearch)
+      || report.status.toLowerCase().includes(normalizedSearch);
+
+    if (!matchesSearch) {
+      return false;
+    }
+
+    if (activeFilter === 'Todos') {
+      return true;
+    }
+
+    return report.title.toLowerCase().includes(activeFilter.slice(0, -1).toLowerCase());
+  });
+
   // Limpia los campos del formulario
   const resetForm = () => {
     setReportType('');
     setReportFormat('');
     setStartDate('');
     setEndDate('');
+    setModalMessage('');
   };
 
   // Cierra el modal y reinicia el formulario
@@ -39,9 +70,10 @@ function ReportsPage() {
   const handleGenerateReport = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    alert('Reporte generado correctamente');
-
-    handleCloseModal();
+    setModalMessage('');
+    setShowModal(false);
+    resetForm();
+    setToastMessage('Reporte generado correctamente.');
   };
 
   return (
@@ -52,6 +84,7 @@ function ReportsPage() {
       {/* Header superior */}
       <header className="reports-top">
         <div>
+          <AdminBreadcrumb current="Reportes" />
           <h1>Reportes</h1>
           <p>Resumen de ingresos, reservas y actividad del motel</p>
         </div>
@@ -59,16 +92,31 @@ function ReportsPage() {
         <div className="reports-top-actions">
           <div className="reports-search">
             <Search size={18} strokeWidth={2.4} />
-            <input type="text" placeholder="Buscar reporte..." />
+            <input
+              type="text"
+              placeholder="Buscar reporte..."
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+            />
           </div>
 
-          <button type="button" onClick={() => setShowModal(true)}>
+          <button
+            type="button"
+            onClick={() => {
+              setModalMessage('');
+              setShowModal(true);
+            }}
+          >
             ＋ Generar reporte
           </button>
         </div>
       </header>
 
       {/* Resumen superior */}
+      {isLoading ? (
+        <AdminSkeleton variant="summary" count={4} label="Cargando resumen de reportes" />
+      ) : (
+      <>
       <section className="reports-summary">
         <article>
           <span className="reports-summary-icon pink">
@@ -113,15 +161,27 @@ function ReportsPage() {
 
       {/* Filtros rápidos */}
       <section className="reports-filters">
-        <button type="button" className="active">Todos</button>
-        <button type="button">Diarios</button>
-        <button type="button">Semanales</button>
-        <button type="button">Mensuales</button>
+        {reportFilters.map((filter) => (
+          <button
+            key={filter}
+            type="button"
+            className={activeFilter === filter ? 'active' : ''}
+            onClick={() => setActiveFilter(filter)}
+          >
+            {filter}
+          </button>
+        ))}
       </section>
+      </>
+      )}
 
       {/* Listado de reportes */}
-      <section className="reports-list">
-        {reports.map((report) => (
+      <section className="reports-list" aria-busy={isLoading}>
+        {isLoading && (
+          <AdminSkeleton variant="card" count={3} label="Cargando reportes" />
+        )}
+
+        {!isLoading && filteredReports.map((report) => (
           <article
             className={`report-card ${report.status.toLowerCase()}`}
             key={report.id}
@@ -155,6 +215,15 @@ function ReportsPage() {
             </div>
           </article>
         ))}
+
+        {!isLoading && filteredReports.length === 0 && (
+          <div className="admin-empty-state">
+            <div>
+              <strong>No hay reportes para mostrar</strong>
+              <p>Prueba con otro tipo de reporte, fecha, estado o monto.</p>
+            </div>
+          </div>
+        )}
       </section>
 
       {/* Modal para generar reporte */}
@@ -173,6 +242,12 @@ function ReportsPage() {
             <p>Selecciona los datos para crear un nuevo reporte.</p>
 
             <form onSubmit={handleGenerateReport}>
+              {modalMessage && (
+                <p className="admin-modal-message">
+                  {modalMessage}
+                </p>
+              )}
+
               <label>
                 Tipo de reporte
                 <select
@@ -239,6 +314,11 @@ function ReportsPage() {
           </div>
         </div>
       )}
+
+      <AdminToast
+        message={toastMessage}
+        onClose={() => setToastMessage('')}
+      />
 
     </main>
     </>

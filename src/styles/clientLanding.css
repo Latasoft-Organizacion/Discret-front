@@ -1,7 +1,8 @@
 .client-landing-page {
+  --client-scroll-fade: 0;
   min-height: 100vh;
   background-size: cover;
-  background-position: center left;
+  background-position: center center;
   background-attachment: fixed;
   background-repeat: no-repeat;
   color: #ffffff;
@@ -9,13 +10,59 @@
   overflow-x: hidden;
   position: relative;
   scroll-behavior: smooth;
+  text-rendering: geometricPrecision;
+}
+
+.client-landing-page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    rgba(5, 8, 15, calc(var(--client-scroll-fade) * 0.42))
+    ,
+    linear-gradient(
+      180deg,
+      rgba(5, 8, 15, 0) 0,
+      rgba(5, 8, 15, 0.03) 42vh,
+      rgba(8, 10, 18, 0.16) 92vh,
+      rgba(8, 10, 18, 0.34) 150vh,
+      rgba(8, 10, 18, 0.52) 100%
+    );
 }
 
 .client-page-shade {
   min-height: 100vh;
   background:
-    radial-gradient(circle at 80% 16%, rgba(236, 72, 153, 0.22), transparent 30%),
-    linear-gradient(180deg, rgba(5, 8, 15, 0.12), rgba(5, 8, 15, 0.96) 68%);
+    radial-gradient(circle at 80% 16%, rgba(236, 72, 153, 0.12), transparent 34%),
+    linear-gradient(
+      180deg,
+      rgba(5, 8, 15, calc(var(--client-scroll-fade) * 0.08)),
+      rgba(5, 8, 15, calc(0.5 + var(--client-scroll-fade) * 0.28)) 82%
+    );
+  position: relative;
+  z-index: 1;
+}
+
+.client-page-shade::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(5, 8, 15, calc(var(--client-scroll-fade) * 0.18)),
+      rgba(5, 8, 15, calc(var(--client-scroll-fade) * 0.82))
+    );
+  transition: background 0.08s linear;
+}
+
+.client-page-shade > * {
+  position: relative;
+  z-index: 1;
 }
 
 .client-navbar {
@@ -38,6 +85,29 @@
   backdrop-filter: blur(16px);
   transform: translateX(-50%);
   z-index: 20;
+  will-change: transform;
+}
+
+.client-reveal {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+  transition:
+    opacity 0.72s ease,
+    transform 0.72s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.client-reveal.is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+.client-benefits-grid .client-reveal:nth-child(2),
+.client-plans-grid .client-reveal:nth-child(2) {
+  transition-delay: 0.08s;
+}
+
+.client-benefits-grid .client-reveal:nth-child(3) {
+  transition-delay: 0.16s;
 }
 
 .client-navbar-logo {
@@ -92,6 +162,7 @@
 }
 
 .client-admin-btn,
+.client-auth-btn,
 .client-menu-btn,
 .client-floating-menu button,
 .client-reserve-btn,
@@ -102,6 +173,7 @@
 }
 
 .client-admin-btn,
+.client-auth-btn,
 .client-footer button {
   min-height: 46px;
   padding: 0 18px;
@@ -112,6 +184,13 @@
   font-size: 13px;
   font-weight: 800;
   transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.client-auth-btn.is-primary,
+.client-footer-primary-btn {
+  border-color: rgba(236, 72, 153, 0.72);
+  background: linear-gradient(135deg, #ec4899, #db2777);
+  box-shadow: 0 14px 28px rgba(236, 72, 153, 0.28);
 }
 
 .client-menu-btn {
@@ -169,12 +248,22 @@
   font-weight: 900;
 }
 
+.client-floating-menu .client-floating-secondary-btn {
+  border: 1px solid rgba(236, 72, 153, 0.34);
+  background: rgba(15, 23, 42, 0.82);
+}
+
 .client-hero-section,
 .client-section,
 .client-footer {
   width: min(1220px, calc(100% - 40px));
   margin: 0 auto;
   scroll-margin-top: 130px;
+}
+
+.client-section {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 760px;
 }
 
 .client-hero-section {
@@ -300,6 +389,7 @@
 
 .client-reserve-btn:hover,
 .client-admin-btn:hover,
+.client-auth-btn:hover,
 .client-footer button:hover {
   transform: translateY(-3px);
   filter: brightness(1.08);
@@ -567,15 +657,14 @@
 .client-plans-heading {
   margin-bottom: 28px;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  column-gap: 22px;
-  align-items: start;
-  padding: 0;
+  grid-template-columns: minmax(210px, 0.42fr) minmax(0, 1fr);
+  column-gap: 26px;
+  align-items: center;
+  padding: 0 30px;
 }
 
 .client-plans-heading .client-kicker {
-  grid-column: 1 / -1;
-  margin: 0 0 12px 30px;
+  margin: 0;
 }
 
 .client-plans-heading h2,
@@ -586,7 +675,7 @@
 }
 
 .client-plans-heading > p:not(.client-kicker) {
-  max-width: none;
+  max-width: 830px;
   margin: 0;
   font-size: 16px;
   line-height: 1.45;
@@ -878,6 +967,14 @@
   letter-spacing: 6px;
 }
 
+.client-footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 .client-whatsapp-float {
   position: fixed;
   right: 26px;
@@ -913,6 +1010,25 @@
   filter: drop-shadow(0 0 10px rgba(34, 197, 94, 0.42));
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .client-landing-page,
+  .client-reveal,
+  .client-navbar,
+  .client-floating-menu,
+  .client-plan-card,
+  .client-reserve-btn,
+  .client-whatsapp-float {
+    scroll-behavior: auto;
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .client-reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @media (max-width: 980px) {
   .client-navbar {
     width: calc(100% - 28px);
@@ -920,6 +1036,10 @@
   }
 
   .client-desktop-nav {
+    display: none;
+  }
+
+  .client-auth-btn {
     display: none;
   }
 
@@ -968,6 +1088,14 @@
     margin-left: 0;
   }
 
+  .client-plans-heading h2 {
+    max-width: 100%;
+  }
+
+  .client-plans-heading > p:not(.client-kicker) {
+    max-width: 720px;
+  }
+
   .client-contact-section {
     grid-template-columns: 1fr;
   }
@@ -981,7 +1109,27 @@
 
 @media (max-width: 640px) {
   .client-landing-page {
+    background-size: cover;
+    background-position: center left;
     background-attachment: scroll;
+  }
+
+  .client-landing-page::before {
+    background:
+      linear-gradient(
+        180deg,
+        rgba(5, 8, 15, 0) 0,
+        rgba(5, 8, 15, 0.06) 44vh,
+        rgba(8, 10, 18, 0.32) 92vh,
+        rgba(8, 10, 18, 0.68) 138vh,
+        #080b12 190vh
+      );
+  }
+
+  .client-page-shade {
+    background:
+      radial-gradient(circle at 72% 14%, rgba(236, 72, 153, 0.12), transparent 36%),
+      linear-gradient(180deg, rgba(5, 8, 15, 0.04), rgba(5, 8, 15, 0.68) 90%);
   }
 
   .client-navbar {
@@ -996,7 +1144,8 @@
     height: 42px;
   }
 
-  .client-admin-btn {
+  .client-admin-btn,
+  .client-auth-btn {
     display: none;
   }
 
@@ -1016,7 +1165,7 @@
   }
 
   .client-hero-section {
-    padding-top: 128px;
+    padding-top: 122px;
     padding-bottom: 58px;
   }
 
@@ -1025,13 +1174,20 @@
   }
 
   .client-hero-copy h1 {
-    font-size: 52px;
-    letter-spacing: 9px;
+    font-size: clamp(60px, 18vw, 74px);
+    letter-spacing: 8px;
+    line-height: 0.95;
+    text-shadow:
+      0 0 8px rgba(236, 72, 153, 1),
+      0 0 28px rgba(236, 72, 153, 0.86),
+      0 0 62px rgba(236, 72, 153, 0.52);
   }
 
   .client-tagline {
-    font-size: 11px;
-    letter-spacing: 4px;
+    margin-top: 16px;
+    font-size: 10px;
+    letter-spacing: 3.2px;
+    line-height: 1.8;
   }
 
   .client-subtitle,
@@ -1067,6 +1223,56 @@
     border-radius: 18px;
   }
 
+  .client-plans-section {
+    padding-top: 42px;
+  }
+
+  .client-plans-heading {
+    margin-bottom: 22px;
+    gap: 10px;
+  }
+
+  .client-plans-heading .client-kicker {
+    font-size: 12px;
+    letter-spacing: 5px;
+  }
+
+  .client-plans-heading h2 {
+    font-size: 24px;
+    line-height: 1.12;
+  }
+
+  .client-plans-heading > p:not(.client-kicker) {
+    font-size: 14px;
+    line-height: 1.55;
+    font-weight: 700;
+  }
+
+  .client-plan-card {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .client-plan-header h3 {
+    font-size: 22px;
+  }
+
+  .client-plan-price {
+    margin-top: 18px;
+    flex-wrap: wrap;
+  }
+
+  .client-plan-price strong {
+    font-size: 34px;
+  }
+
+  .client-plan-price span,
+  .client-plan-ideal,
+  .client-plan-features li,
+  .client-plan-btn {
+    font-size: 14px;
+  }
+
   .client-plan-badge {
     position: static;
     width: max-content;
@@ -1077,8 +1283,37 @@
     padding: 62px 0;
   }
 
+  .client-footer {
+    align-items: center;
+    gap: 14px;
+    text-align: center;
+  }
+
+  .client-footer-actions {
+    justify-content: center;
+  }
+
   .client-footer strong {
+    max-width: 260px;
+    font-size: 9px;
+    letter-spacing: 3px;
     line-height: 1.8;
+    text-align: center;
+  }
+
+  .client-footer span {
+    text-align: center;
+    font-size: 12px;
+  }
+
+  .client-footer button {
+    min-height: 38px;
+    width: max-content;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0 14px;
+    border-radius: 10px;
+    font-size: 11px;
   }
 
   .client-whatsapp-float {
@@ -1091,5 +1326,67 @@
   .client-whatsapp-float img {
     width: 34px;
     height: 34px;
+  }
+}
+
+@media (max-width: 380px) {
+  .client-hero-section,
+  .client-section,
+  .client-footer {
+    width: min(100% - 20px, 1220px);
+  }
+
+  .client-navbar {
+    width: calc(100% - 20px);
+  }
+
+  .client-hero-copy h1 {
+    font-size: 56px;
+    letter-spacing: 7px;
+  }
+
+  .client-tagline {
+    font-size: 9px;
+    letter-spacing: 2.6px;
+  }
+
+  .client-plans-heading {
+    display: block;
+  }
+
+  .client-plans-heading .client-kicker {
+    margin-bottom: 14px;
+    font-size: 11px;
+    line-height: 1.45;
+    letter-spacing: 4px;
+  }
+
+  .client-plans-heading h2 {
+    margin-bottom: 12px;
+    font-size: 21px;
+    line-height: 1.16;
+  }
+
+  .client-plans-heading > p:not(.client-kicker) {
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  .client-plan-card,
+  .client-hero-card,
+  .client-qr-card,
+  .client-about-panel,
+  .client-benefits-grid article,
+  .client-brand-story-panel,
+  .client-cta-section {
+    padding: 20px;
+  }
+
+  .client-plan-price strong {
+    font-size: 30px;
+  }
+
+  .client-plan-price span {
+    font-size: 13px;
   }
 }

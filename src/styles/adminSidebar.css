@@ -144,40 +144,667 @@
   color: #ffffff;
 }
 
+.admin-breadcrumb {
+  padding-left: 50px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.admin-breadcrumb span:first-child {
+  color: #64748b;
+}
+
+.admin-breadcrumb strong {
+  color: #ff4fa3;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  text-shadow: 0 0 14px rgba(236, 72, 153, 0.34);
+}
+
+.dashboard-main button,
+.rooms-admin-main button,
+.admin-reservations-main button,
+.agenda-page button,
+.clients-page button,
+.reports-page button,
+.settings-page button,
+.dashboard-main a,
+.rooms-admin-main a,
+.admin-reservations-main a,
+.agenda-page a,
+.clients-page a,
+.reports-page a,
+.settings-page a,
+.admin-menu a,
+.admin-logout-link,
+.admin-sidebar-toggle {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.dashboard-main button,
+.rooms-admin-main button,
+.admin-reservations-main button,
+.agenda-page button,
+.clients-page button,
+.reports-page button,
+.settings-page button,
+.admin-menu a,
+.admin-logout-link,
+.admin-sidebar-toggle {
+  will-change: transform;
+}
+
+.dashboard-main button:active,
+.rooms-admin-main button:active,
+.admin-reservations-main button:active,
+.agenda-page button:active,
+.clients-page button:active,
+.reports-page button:active,
+.settings-page button:active,
+.admin-menu a:active,
+.admin-logout-link:active,
+.admin-sidebar-toggle:active {
+  transform: translateY(1px) scale(0.985);
+}
+
+.dashboard-main :is(button, a, input, select, textarea):focus-visible,
+.rooms-admin-main :is(button, a, input, select, textarea):focus-visible,
+.admin-reservations-main :is(button, a, input, select, textarea):focus-visible,
+.agenda-page :is(button, a, input, select, textarea):focus-visible,
+.clients-page :is(button, a, input, select, textarea):focus-visible,
+.reports-page :is(button, a, input, select, textarea):focus-visible,
+.settings-page :is(button, a, input, select, textarea):focus-visible,
+.admin-sidebar :is(a, button):focus-visible,
+.admin-sidebar-toggle:focus-visible {
+  outline: 2px solid rgba(255, 79, 163, 0.86);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 5px rgba(236, 72, 153, 0.14);
+}
+
+.rooms-summary article,
+.admin-reservations-summary article,
+.agenda-summary article,
+.clients-summary article,
+.reports-summary article,
+.settings-summary article,
+.room-card,
+.panel,
+.room-detail-card,
+.agenda-card,
+.client-card,
+.report-card,
+.settings-card,
+.admin-recent-reservations,
+.admin-reservations-table,
+.quick-actions button {
+  transition:
+    transform 0.22s ease,
+    border-color 0.22s ease,
+    box-shadow 0.22s ease,
+    background 0.22s ease,
+    filter 0.22s ease;
+}
+
+.rooms-summary article:hover,
+.admin-reservations-summary article:hover,
+.agenda-summary article:hover,
+.clients-summary article:hover,
+.reports-summary article:hover,
+.settings-summary article:hover,
+.panel:hover,
+.admin-recent-reservations:hover,
+.admin-reservations-table:hover,
+.settings-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(236, 72, 153, 0.26);
+  box-shadow:
+    0 18px 42px rgba(0, 0, 0, 0.25),
+    0 0 26px rgba(236, 72, 153, 0.08);
+}
+
+.rooms-summary article:hover svg,
+.admin-reservations-summary article:hover svg,
+.agenda-summary article:hover svg,
+.clients-summary article:hover svg,
+.reports-summary article:hover svg,
+.settings-summary article:hover svg,
+.quick-actions button:hover svg,
+.room-actions button:hover svg,
+.agenda-actions button:hover svg,
+.client-actions button:hover svg,
+.report-actions button:hover svg,
+.table-actions button:hover svg {
+  transform: scale(1.08);
+  filter: drop-shadow(0 0 8px rgba(236, 72, 153, 0.35));
+}
+
+.rooms-summary article svg,
+.admin-reservations-summary article svg,
+.agenda-summary article svg,
+.clients-summary article svg,
+.reports-summary article svg,
+.settings-summary article svg,
+.quick-actions button svg,
+.room-actions button svg,
+.agenda-actions button svg,
+.client-actions button svg,
+.report-actions button svg,
+.table-actions button svg {
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.rooms-filters button,
+.agenda-filters button,
+.clients-filters button,
+.reports-filters button {
+  position: relative;
+  overflow: hidden;
+}
+
+.rooms-filters button::after,
+.agenda-filters button::after,
+.clients-filters button::after,
+.reports-filters button::after {
+  content: "";
+  position: absolute;
+  inset: auto 14px 8px;
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.75);
+  opacity: 0;
+  transform: scaleX(0.35);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.rooms-filters button:hover::after,
+.rooms-filters button.active::after,
+.agenda-filters button:hover::after,
+.agenda-filters button.active::after,
+.clients-filters button:hover::after,
+.clients-filters button.active::after,
+.reports-filters button:hover::after,
+.reports-filters button.active::after {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+.rooms-search,
+.admin-search,
+.agenda-search,
+.clients-search,
+.reports-search {
+  transition:
+    border-color 0.22s ease,
+    box-shadow 0.22s ease,
+    background 0.22s ease,
+    transform 0.22s ease;
+}
+
+.rooms-search:focus-within,
+.admin-search:focus-within,
+.agenda-search:focus-within,
+.clients-search:focus-within,
+.reports-search:focus-within {
+  border-color: rgba(236, 72, 153, 0.48);
+  box-shadow:
+    0 0 0 3px rgba(236, 72, 153, 0.1),
+    0 16px 34px rgba(0, 0, 0, 0.18);
+  background: rgba(15, 23, 42, 0.96);
+  transform: translateY(-1px);
+}
+
+.table-row,
+.agenda-row,
+.reservation-row {
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.table-row:hover,
+.agenda-row:hover,
+.reservation-row:hover {
+  background: rgba(236, 72, 153, 0.045);
+}
+
+.room-detail-card,
+.agenda-card,
+.client-card,
+.report-card,
+.settings-card,
+.rooms-summary article,
+.admin-reservations-summary article,
+.agenda-summary article,
+.clients-summary article,
+.reports-summary article,
+.settings-summary article {
+  animation: admin-soft-rise 0.34s ease both;
+}
+
+@keyframes admin-soft-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.admin-empty-state {
+  min-height: 180px;
+  padding: 28px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  border: 1px solid rgba(236, 72, 153, 0.2);
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(236, 72, 153, 0.12), transparent 46%),
+    rgba(17, 24, 39, 0.78);
+  color: #cbd5e1;
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.18),
+    inset 0 0 22px rgba(236, 72, 153, 0.04);
+}
+
+.admin-empty-state div {
+  max-width: 420px;
+}
+
+.admin-empty-state strong {
+  display: block;
+  color: #ffffff;
+  font-size: 18px;
+  line-height: 1.3;
+}
+
+.admin-empty-state p {
+  margin-top: 8px;
+  color: #94a3b8;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.admin-modal-message {
+  grid-column: 1 / -1;
+  padding: 12px 14px;
+  border: 1px solid rgba(236, 72, 153, 0.28);
+  border-radius: 12px;
+  background: rgba(236, 72, 153, 0.1);
+  color: #ffd7eb;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.5;
+}
+
+.room-modal-overlay,
+.admin-reservation-modal-overlay,
+.client-modal-overlay,
+.agenda-modal-overlay,
+.dashboard-modal-overlay,
+.report-modal-overlay {
+  align-items: center;
+  justify-content: center;
+  padding: 22px;
+}
+
+.room-modal,
+.admin-reservation-modal,
+.client-modal,
+.agenda-modal,
+.dashboard-modal,
+.report-modal,
+.recovery-modal {
+  max-height: calc(100svh - 44px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(236, 72, 153, 0.55) rgba(15, 23, 42, 0.8);
+}
+
+.room-modal-header button,
+.admin-reservation-modal-header button,
+.client-modal-header button,
+.agenda-modal-header button,
+.dashboard-modal-header button,
+.report-modal-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.room-modal-header button:hover,
+.admin-reservation-modal-header button:hover,
+.client-modal-header button:hover,
+.agenda-modal-header button:hover,
+.dashboard-modal-header button:hover,
+.report-modal-close:hover {
+  transform: translateY(-1px);
+  background: rgba(236, 72, 153, 0.1);
+}
+
+.room-modal-actions button,
+.admin-reservation-modal-actions button,
+.client-modal-actions button,
+.agenda-modal-actions button,
+.dashboard-modal-actions button,
+.report-modal-actions button {
+  transition: transform 0.2s ease, filter 0.2s ease, border-color 0.2s ease;
+}
+
+.room-modal-actions button:hover,
+.admin-reservation-modal-actions button:hover,
+.client-modal-actions button:hover,
+.agenda-modal-actions button:hover,
+.dashboard-modal-actions button:hover,
+.report-modal-actions button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+}
+
+@media (max-width: 640px) {
+  .room-modal-overlay,
+  .admin-reservation-modal-overlay,
+  .client-modal-overlay,
+  .agenda-modal-overlay,
+  .dashboard-modal-overlay,
+  .report-modal-overlay {
+    align-items: flex-end;
+    padding: 12px;
+  }
+
+  .room-modal,
+  .admin-reservation-modal,
+  .client-modal,
+  .agenda-modal,
+  .dashboard-modal,
+  .report-modal,
+  .recovery-modal {
+    width: 100%;
+    max-height: calc(100svh - 24px);
+    border-radius: 18px;
+  }
+
+  .room-modal-actions,
+  .admin-reservation-modal-actions,
+  .client-modal-actions,
+  .agenda-modal-actions,
+  .dashboard-modal-actions,
+  .report-modal-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .room-modal-actions button,
+  .admin-reservation-modal-actions button,
+  .client-modal-actions button,
+  .agenda-modal-actions button,
+  .dashboard-modal-actions button,
+  .report-modal-actions button {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
 @media (max-width: 1000px) {
-  .admin-sidebar {
+  body .admin-sidebar {
     width: min(280px, calc(100vw - 76px));
     min-height: 100svh;
     position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 100;
+    margin: 0;
     transform: translateX(-100%);
     box-shadow: 22px 0 46px rgba(0, 0, 0, 0.34);
   }
 
-  .admin-sidebar.is-open {
+  body .admin-sidebar.is-open {
     transform: translateX(0);
   }
 
-  .admin-sidebar-toggle,
-  .admin-sidebar-toggle.is-closed {
+  body .admin-sidebar.is-collapsed {
+    transform: translateX(-100%);
+  }
+
+  body .admin-sidebar-toggle,
+  body .admin-sidebar-toggle.is-closed {
     left: 16px;
     top: 16px;
   }
 
-  .admin-sidebar.is-open + .dashboard-main,
-  .admin-sidebar.is-open + .admin-reservations-main,
-  .admin-sidebar.is-open + .rooms-admin-main,
-  .admin-sidebar.is-open + .agenda-page,
-  .admin-sidebar.is-open + .clients-page,
-  .admin-sidebar.is-open + .reports-page,
-  .admin-sidebar.is-open + .settings-page,
-  .admin-sidebar.is-collapsed + .dashboard-main,
-  .admin-sidebar.is-collapsed + .admin-reservations-main,
-  .admin-sidebar.is-collapsed + .rooms-admin-main,
-  .admin-sidebar.is-collapsed + .agenda-page,
-  .admin-sidebar.is-collapsed + .clients-page,
-  .admin-sidebar.is-collapsed + .reports-page,
-  .admin-sidebar.is-collapsed + .settings-page {
+  body .admin-sidebar.is-open + .dashboard-main,
+  body .admin-sidebar.is-open + .admin-reservations-main,
+  body .admin-sidebar.is-open + .rooms-admin-main,
+  body .admin-sidebar.is-open + .agenda-page,
+  body .admin-sidebar.is-open + .clients-page,
+  body .admin-sidebar.is-open + .reports-page,
+  body .admin-sidebar.is-open + .settings-page,
+  body .admin-sidebar.is-collapsed + .dashboard-main,
+  body .admin-sidebar.is-collapsed + .admin-reservations-main,
+  body .admin-sidebar.is-collapsed + .rooms-admin-main,
+  body .admin-sidebar.is-collapsed + .agenda-page,
+  body .admin-sidebar.is-collapsed + .clients-page,
+  body .admin-sidebar.is-collapsed + .reports-page,
+  body .admin-sidebar.is-collapsed + .settings-page {
     width: 100%;
     margin-left: 0;
+    padding-top: 84px;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  body .admin-sidebar.is-open + .dashboard-main,
+  body .admin-sidebar.is-open + .admin-reservations-main,
+  body .admin-sidebar.is-open + .rooms-admin-main,
+  body .admin-sidebar.is-open + .agenda-page,
+  body .admin-sidebar.is-open + .clients-page,
+  body .admin-sidebar.is-open + .reports-page,
+  body .admin-sidebar.is-open + .settings-page {
+    pointer-events: none;
+  }
+
+  body .admin-sidebar.is-open {
+    pointer-events: auto;
+  }
+
+  body .dashboard-header .admin-breadcrumb {
+    padding-left: 0;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1100px) {
+  .rooms-summary,
+  .admin-reservations-summary,
+  .agenda-summary,
+  .clients-summary,
+  .reports-summary,
+  .settings-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-breadcrumb {
+    padding-left: 52px;
+    margin-bottom: 10px;
+    min-height: 28px;
+    flex-wrap: wrap;
+    row-gap: 4px;
+    font-size: 10px;
+  }
+
+  .rooms-top,
+  .admin-reservations-header,
+  .agenda-top,
+  .clients-top,
+  .reports-top,
+  .settings-top {
+    gap: 14px;
+  }
+
+  .rooms-top h1,
+  .admin-reservations-header h1,
+  .agenda-top h1,
+  .clients-top h1,
+  .reports-top h1,
+  .settings-top h1 {
+    font-size: 22px;
+    line-height: 1.16;
+  }
+
+  .rooms-top p,
+  .admin-reservations-header p,
+  .agenda-top p,
+  .clients-top p,
+  .reports-top p,
+  .settings-top p {
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  .rooms-top-actions,
+  .admin-reservations-actions,
+  .agenda-top-actions,
+  .clients-top-actions,
+  .reports-top-actions {
+    width: 100%;
+    gap: 10px;
+  }
+
+  .rooms-search,
+  .admin-search,
+  .agenda-search,
+  .clients-search,
+  .reports-search {
+    width: 100%;
+    min-width: 0;
+    height: 46px;
+  }
+
+  .rooms-search input,
+  .admin-search input,
+  .agenda-search input,
+  .clients-search input,
+  .reports-search input {
+    min-width: 0;
+    font-size: 13px;
+  }
+
+  .rooms-top-actions button,
+  .admin-reservations-actions button,
+  .agenda-top-actions button,
+  .clients-top-actions button,
+  .reports-top-actions button,
+  .quick-actions button {
+    min-height: 46px;
+    padding: 0 14px;
+    border-radius: 11px;
+    font-size: 12px;
+  }
+
+  .rooms-filters,
+  .agenda-filters,
+  .clients-filters,
+  .reports-filters {
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+
+  .rooms-filters::-webkit-scrollbar,
+  .agenda-filters::-webkit-scrollbar,
+  .clients-filters::-webkit-scrollbar,
+  .reports-filters::-webkit-scrollbar {
+    display: none;
+  }
+
+  .rooms-filters button,
+  .agenda-filters button,
+  .clients-filters button,
+  .reports-filters button {
+    min-width: max-content;
+    height: 42px;
+    padding: 0 16px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 390px) {
+  body .admin-sidebar-toggle,
+  body .admin-sidebar-toggle.is-closed {
+    left: 14px;
+    top: 14px;
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+  }
+
+  body .admin-sidebar.is-open + .dashboard-main,
+  body .admin-sidebar.is-open + .admin-reservations-main,
+  body .admin-sidebar.is-open + .rooms-admin-main,
+  body .admin-sidebar.is-open + .agenda-page,
+  body .admin-sidebar.is-open + .clients-page,
+  body .admin-sidebar.is-open + .reports-page,
+  body .admin-sidebar.is-open + .settings-page,
+  body .admin-sidebar.is-collapsed + .dashboard-main,
+  body .admin-sidebar.is-collapsed + .admin-reservations-main,
+  body .admin-sidebar.is-collapsed + .rooms-admin-main,
+  body .admin-sidebar.is-collapsed + .agenda-page,
+  body .admin-sidebar.is-collapsed + .clients-page,
+  body .admin-sidebar.is-collapsed + .reports-page,
+  body .admin-sidebar.is-collapsed + .settings-page {
+    padding-top: 72px;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .admin-breadcrumb {
+    padding-left: 46px;
+    font-size: 9px;
+    letter-spacing: 0;
+  }
+
+  .rooms-top h1,
+  .admin-reservations-header h1,
+  .agenda-top h1,
+  .clients-top h1,
+  .reports-top h1,
+  .settings-top h1 {
+    font-size: 20px;
+  }
+
+  .rooms-summary article,
+  .admin-reservations-summary article,
+  .agenda-summary article,
+  .clients-summary article,
+  .reports-summary article,
+  .settings-summary article {
+    min-height: 74px;
+    padding: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-main *,
+  .rooms-admin-main *,
+  .admin-reservations-main *,
+  .agenda-page *,
+  .clients-page *,
+  .reports-page *,
+  .settings-page *,
+  .admin-sidebar *,
+  .admin-sidebar-toggle {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
   }
 }

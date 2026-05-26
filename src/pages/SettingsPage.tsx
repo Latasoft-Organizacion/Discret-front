@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Bed, Bell, Building2, MessageCircle, ShieldCheck } from 'lucide-react';
+import AdminBreadcrumb from '../components/AdminBreadcrumb';
+import AdminToast, { type AdminToastType } from '../components/AdminToast';
 import AdminSidebar from '../components/AdminSidebar';
 import '../styles/adminSidebar.css';
 import '../styles/settings.css';
@@ -49,6 +51,7 @@ function SettingsPage() {
   });
   const [saveMessage, setSaveMessage] = useState('');
   const [settingsError, setSettingsError] = useState('');
+  const [toastType, setToastType] = useState<AdminToastType>('success');
 
   const whatsappUrl = useMemo(() => {
     const cleanNumber = whatsappSettings.number.replace(/\D/g, '');
@@ -129,11 +132,13 @@ function SettingsPage() {
     ) {
       setSaveMessage('');
       setSettingsError('Las contraseñas no coinciden.');
+      setToastType('error');
       return;
     }
 
     setSettingsError('');
     setSaveMessage('Configuración guardada correctamente.');
+    setToastType('success');
   };
 
   const undoSettings = () => {
@@ -181,6 +186,7 @@ function SettingsPage() {
     });
     setSettingsError('');
     setSaveMessage('Cambios deshechos correctamente.');
+    setToastType('info');
   };
 
   return (
@@ -191,6 +197,7 @@ function SettingsPage() {
       {/* Header superior */}
       <header className="settings-top">
         <div>
+          <AdminBreadcrumb current="Configuración" />
           <h1>Configuración</h1>
           <p>Ajustes generales del sistema de reservas</p>
         </div>
@@ -684,8 +691,6 @@ function SettingsPage() {
         <div>
           <strong>Guardar configuración</strong>
           <p>Aplica o descarta los cambios realizados en esta página.</p>
-          {saveMessage && <span className="settings-save-message">{saveMessage}</span>}
-          {settingsError && <span className="settings-error-message">{settingsError}</span>}
         </div>
 
         <div className="settings-actions-buttons">
@@ -697,6 +702,15 @@ function SettingsPage() {
           </button>
         </div>
       </section>
+
+      <AdminToast
+        message={settingsError || saveMessage}
+        type={settingsError ? 'error' : toastType}
+        onClose={() => {
+          setSaveMessage('');
+          setSettingsError('');
+        }}
+      />
 
     </main>
     </>

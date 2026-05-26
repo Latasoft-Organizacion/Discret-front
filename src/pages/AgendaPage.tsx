@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import { CalendarDays, CheckCircle2, Clock3, Search, Sparkles } from 'lucide-react';
+import AdminBreadcrumb from '../components/AdminBreadcrumb';
+import { AdminSkeleton } from '../components/AdminLoading';
+import AdminToast from '../components/AdminToast';
 import AdminSidebar from '../components/AdminSidebar';
 import '../styles/adminSidebar.css';
 import '../styles/agenda.css';
@@ -11,6 +14,8 @@ function AgendaPage() {
   // Estado modal nuevo evento
   const [showModal, setShowModal] = useState(false);
   const [activeFilter, setActiveFilter] = useState<AgendaFilter>('Hoy');
+  const [toastMessage, setToastMessage] = useState('');
+  const isLoading = false;
 
   // Datos simulados de agenda
   const agenda = [
@@ -42,6 +47,12 @@ function AgendaPage() {
   const cleaningCount = agenda.filter((item) => item.type === 'Limpieza').length;
   const pendingCount = agenda.filter((item) => item.status === 'Pendiente').length;
 
+  const handleSaveEvent = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setShowModal(false);
+    setToastMessage('Evento guardado correctamente.');
+  };
+
   return (
     <>
     <AdminSidebar active="agenda" />
@@ -51,6 +62,7 @@ function AgendaPage() {
       <header className="agenda-top">
 
         <div>
+          <AdminBreadcrumb current="Agenda" />
           <h1>Agenda</h1>
           <p>Programación diaria de reservas y actividades</p>
         </div>
@@ -80,6 +92,10 @@ function AgendaPage() {
       </header>
 
       {/* Resumen superior */}
+      {isLoading ? (
+        <AdminSkeleton variant="summary" count={4} label="Cargando resumen de agenda" />
+      ) : (
+      <>
       <section className="agenda-summary">
 
         <article>
@@ -143,11 +159,17 @@ function AgendaPage() {
         ))}
 
       </section>
+      </>
+      )}
 
       {/* Listado agenda */}
-      <section className="agenda-list">
+      <section className="agenda-list" aria-busy={isLoading}>
 
-        {filteredAgenda.map((item) => (
+        {isLoading && (
+          <AdminSkeleton variant="card" count={4} label="Cargando agenda" />
+        )}
+
+        {!isLoading && filteredAgenda.map((item) => (
 
           <article
             className={`agenda-card ${item.status.toLowerCase()}`}
@@ -181,9 +203,12 @@ function AgendaPage() {
 
         ))}
 
-        {filteredAgenda.length === 0 && (
-          <div className="agenda-empty-state">
-            No hay eventos para este filtro.
+        {!isLoading && filteredAgenda.length === 0 && (
+          <div className="admin-empty-state">
+            <div>
+              <strong>No hay eventos para mostrar</strong>
+              <p>Prueba con otro filtro o crea un nuevo evento para esta agenda.</p>
+            </div>
           </div>
         )}
 
@@ -217,7 +242,7 @@ function AgendaPage() {
             </div>
 
             {/* Formulario modal */}
-            <form className="agenda-modal-form">
+            <form className="agenda-modal-form" onSubmit={handleSaveEvent}>
 
               <label>
                 Hora
@@ -284,6 +309,11 @@ function AgendaPage() {
         </div>
 
       )}
+
+      <AdminToast
+        message={toastMessage}
+        onClose={() => setToastMessage('')}
+      />
 
     </main>
     </>

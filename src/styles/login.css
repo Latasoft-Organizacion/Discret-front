@@ -409,6 +409,37 @@ form label {
   box-shadow: 0 18px 40px rgba(236, 72, 153, 0.45);
 }
 
+.login-register-callout {
+  margin-top: 18px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 1px solid rgba(236, 72, 153, 0.22);
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.58);
+  color: #cbd5e1;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.login-register-callout button {
+  border: none;
+  background: transparent;
+  color: #ff4fa3;
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+  text-shadow: 0 0 10px rgba(236, 72, 153, 0.42);
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.login-register-callout button:hover {
+  color: #ff7fbd;
+  transform: translateY(-1px);
+}
+
 /* Footer inferior  - titulo Acceso exclusivo para administradores */
 .login-footer {
   margin-top: 0;
@@ -613,6 +644,13 @@ form label {
   .login-button {
     height: 56px;
     font-size: 17px;
+  }
+
+  .login-register-callout {
+    flex-direction: column;
+    gap: 6px;
+    font-size: 13px;
+    text-align: center;
   }
 
   .login-footer {

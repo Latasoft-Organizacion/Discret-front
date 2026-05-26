@@ -11,6 +11,9 @@ import {
   X,
 } from 'lucide-react';
 
+import AdminBreadcrumb from '../components/AdminBreadcrumb';
+import { AdminSkeleton } from '../components/AdminLoading';
+import AdminToast from '../components/AdminToast';
 import AdminSidebar from '../components/AdminSidebar';
 
 import '../styles/adminSidebar.css';
@@ -22,6 +25,10 @@ function AdminReservationsPage() {
   ======================================== */
 
   const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [modalMessage, setModalMessage] = useState('');
+  const [toastMessage, setToastMessage] = useState('');
+  const isLoading = false;
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingReservation, setEditingReservation] = useState<Reservation | null>(null);
   const [detailReservation, setDetailReservation] = useState<Reservation | null>(null);
@@ -102,7 +109,7 @@ function AdminReservationsPage() {
     const { client, room, entry, exit, status, payment } = newReservation;
 
     if (!client || !room || !entry || !exit || !status || !payment) {
-      alert('Completa todos los campos para crear la reserva.');
+      setModalMessage('Completa todos los campos para crear la reserva.');
       return;
     }
 
@@ -127,7 +134,9 @@ function AdminReservationsPage() {
       status: 'Pendiente',
       payment: 'Efectivo',
     });
+    setModalMessage('');
     setShowCreateModal(false);
+    setToastMessage(`Reserva ${Math.max(...reservations.map((reservation) => reservation.id)) + 1} creada correctamente.`);
   };
 
   const handleUpdateReservation = (event: React.FormEvent<HTMLFormElement>) => {
@@ -140,7 +149,7 @@ function AdminReservationsPage() {
     const { client, room, entry, exit, status, payment } = editingReservation;
 
     if (!client || !room || !entry || !exit || !status || !payment) {
-      alert('Completa todos los campos para modificar la reserva.');
+      setModalMessage('Completa todos los campos para modificar la reserva.');
       return;
     }
 
@@ -151,19 +160,37 @@ function AdminReservationsPage() {
     );
 
     setEditingReservation(null);
+    setModalMessage('');
+    setToastMessage(`Reserva ${editingReservation.id} actualizada correctamente.`);
   };
 
   /* ========================================
       RESERVAS VISIBLES TABLA
   ======================================== */
 
-  const visibleReservations = reservations.slice(0, itemsPerPage);
+  const filteredReservations = reservations.filter((reservation) => {
+    const normalizedSearch = searchTerm.trim().toLowerCase();
+
+    if (!normalizedSearch) {
+      return true;
+    }
+
+    return (
+      String(reservation.id).includes(normalizedSearch)
+      || reservation.client.toLowerCase().includes(normalizedSearch)
+      || reservation.room.toLowerCase().includes(normalizedSearch)
+      || reservation.status.toLowerCase().includes(normalizedSearch)
+      || reservation.payment.toLowerCase().includes(normalizedSearch)
+    );
+  });
+
+  const visibleReservations = filteredReservations.slice(0, itemsPerPage);
 
   /* ========================================
       RESERVAS RECIENTES
   ======================================== */
 
-  const recentReservations = reservations.slice(0, 4);
+  const recentReservations = filteredReservations.slice(0, 4);
 
   return (
     <main className="admin-reservations-layout">
@@ -181,6 +208,7 @@ function AdminReservationsPage() {
         {/* HEADER */}
         <header className="admin-reservations-header">
           <div>
+            <AdminBreadcrumb current="Reservas" />
             <h1>Gestión de Reservas</h1>
             <p>Historial y nuevas reservas</p>
           </div>
@@ -193,6 +221,8 @@ function AdminReservationsPage() {
               <input
                 type="text"
                 placeholder="Buscar reserva..."
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
               />
             </div>
 
@@ -207,6 +237,10 @@ function AdminReservationsPage() {
             TARJETAS RESUMEN
         ======================================== */}
 
+        {isLoading ? (
+          <AdminSkeleton variant="summary" count={3} label="Cargando resumen de reservas" />
+        ) : (
+        <>
         <section className="admin-reservations-summary">
           {/* CONFIRMADAS */}
           <article>
@@ -265,7 +299,7 @@ function AdminReservationsPage() {
             TABLA RESERVAS
         ======================================== */}
 
-        <section className="admin-reservations-table">
+        <section className="admin-reservations-table" aria-busy={isLoading}>
           <div className="table-header">
             <span>ID Reserva</span>
             <span>Cliente</span>
@@ -277,7 +311,11 @@ function AdminReservationsPage() {
             <span>Acciones</span>
           </div>
 
-          {visibleReservations.map((reservation) => (
+          {isLoading && (
+            <AdminSkeleton variant="table" count={5} label="Cargando reservas" />
+          )}
+
+          {!isLoading && visibleReservations.map((reservation) => (
             <div className="table-row" key={reservation.id}>
               <span>{reservation.id}</span>
               <span>{reservation.client}</span>
@@ -304,7 +342,20 @@ function AdminReservationsPage() {
               </div>
             </div>
           ))}
+
+          {!isLoading && visibleReservations.length === 0 && (
+            <div className="admin-empty-state admin-table-empty">
+              <div>
+                <strong>No hay reservas para mostrar</strong>
+                <p>
+                  Prueba con otro cliente, habitación, estado, tipo de pago o ID de reserva.
+                </p>
+              </div>
+            </div>
+          )}
         </section>
+        </>
+        )}
 
         {/* ========================================
             RESERVAS RECIENTES
@@ -320,7 +371,11 @@ function AdminReservationsPage() {
           </div>
 
           <div className="recent-list">
-            {recentReservations.map((reservation) => (
+            {isLoading && (
+              <AdminSkeleton variant="row" count={3} label="Cargando reservas recientes" />
+            )}
+
+            {!isLoading && recentReservations.map((reservation) => (
               <article key={reservation.id}>
                 <div>
                   <strong>{reservation.room}</strong>
@@ -333,6 +388,15 @@ function AdminReservationsPage() {
                 </div>
               </article>
             ))}
+
+            {!isLoading && recentReservations.length === 0 && (
+              <div className="admin-empty-state">
+                <div>
+                  <strong>No hay reservas recientes</strong>
+                  <p>Cuando se registren reservas, aparecerán en este resumen.</p>
+                </div>
+              </div>
+            )}
           </div>
         </section>
       </section>
@@ -346,12 +410,20 @@ function AdminReservationsPage() {
                 <p>Registra una reserva creada desde administración.</p>
               </div>
 
-              <button type="button" onClick={() => setShowCreateModal(false)}>
+              <button
+                type="button"
+                onClick={() => {
+                  setModalMessage('');
+                  setShowCreateModal(false);
+                }}
+              >
                 <X size={20} />
               </button>
             </div>
 
             <form className="admin-reservation-modal-form" onSubmit={handleCreateReservation}>
+              {modalMessage && <p className="admin-modal-message">{modalMessage}</p>}
+
               <label>
                 Cliente
                 <input
@@ -446,7 +518,13 @@ function AdminReservationsPage() {
               </label>
 
               <div className="admin-reservation-modal-actions">
-                <button type="button" onClick={() => setShowCreateModal(false)}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setModalMessage('');
+                    setShowCreateModal(false);
+                  }}
+                >
                   Cancelar
                 </button>
 
@@ -468,12 +546,20 @@ function AdminReservationsPage() {
                 <p>Actualiza los datos de la reserva seleccionada.</p>
               </div>
 
-              <button type="button" onClick={() => setEditingReservation(null)}>
+              <button
+                type="button"
+                onClick={() => {
+                  setModalMessage('');
+                  setEditingReservation(null);
+                }}
+              >
                 <X size={20} />
               </button>
             </div>
 
             <form className="admin-reservation-modal-form" onSubmit={handleUpdateReservation}>
+              {modalMessage && <p className="admin-modal-message">{modalMessage}</p>}
+
               <label>
                 Cliente
                 <input
@@ -560,7 +646,13 @@ function AdminReservationsPage() {
               </label>
 
               <div className="admin-reservation-modal-actions">
-                <button type="button" onClick={() => setEditingReservation(null)}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setModalMessage('');
+                    setEditingReservation(null);
+                  }}
+                >
                   Cancelar
                 </button>
 
@@ -626,6 +718,11 @@ function AdminReservationsPage() {
           </div>
         </div>
       )}
+
+      <AdminToast
+        message={toastMessage}
+        onClose={() => setToastMessage('')}
+      />
     </main>
   );
 }

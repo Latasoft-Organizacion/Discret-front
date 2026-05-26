@@ -1,10 +1,12 @@
 import { type FormEvent, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../styles/login.css';
 import motelLogin from '../assets/images/motel-login.png';
 import { Bed, CheckCircle2, Eye, EyeOff, KeyRound, LockKeyhole, Mail, Send, X } from 'lucide-react';
 
 
 function LoginPage() {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [isRecoveryOpen, setIsRecoveryOpen] = useState(false);
   const [recoveryEmail, setRecoveryEmail] = useState('');
@@ -47,7 +49,7 @@ function LoginPage() {
           </div>
 
           <h1>DISCRET</h1>
-          <h3>Panel de Administración</h3>
+          <h3>Iniciar sesión</h3>
 
           <div className="divider">
             <span>
@@ -61,7 +63,7 @@ function LoginPage() {
               <span>
                 <Mail size={18} strokeWidth={2.3} />
               </span>
-              <input type="email" placeholder="admin@motel.com" />
+              <input type="email" placeholder="correo@ejemplo.com" />
             </div>
 
             <label>Contraseña</label>
@@ -106,6 +108,12 @@ function LoginPage() {
             <button type="submit" className="login-button">
               Iniciar sesión
             </button>
+            <div className="login-register-callout">
+              <span>¿No tienes cuenta?</span>
+              <button type="button" onClick={() => navigate('/registro')}>
+                Registrarse
+              </button>
+            </div>
           </form>
         </div>
 
@@ -155,7 +163,7 @@ function LoginPage() {
                   <input
                     id="recovery-email"
                     type="email"
-                    placeholder="admin@motel.com"
+                    placeholder="correo@ejemplo.com"
                     value={recoveryEmail}
                     onChange={(event) => setRecoveryEmail(event.target.value)}
                   />
