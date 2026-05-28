@@ -498,6 +498,218 @@
   height: 58px;
 }
 
+.client-rating-page {
+  display: block;
+}
+
+.client-rating-logo {
+  margin-top: 36px;
+}
+
+.client-rating-shell {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(280px, 0.82fr) minmax(0, 1.18fr);
+  gap: 28px;
+  align-items: stretch;
+}
+
+.client-rating-copy {
+  padding: 34px;
+  border: 1px solid rgba(236, 72, 153, 0.18);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 0 0, rgba(236, 72, 153, 0.14), transparent 36%),
+    rgba(15, 23, 42, 0.64);
+  box-shadow: 0 22px 50px rgba(0, 0, 0, 0.22);
+}
+
+.client-rating-copy h1 {
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(30px, 4vw, 48px);
+  line-height: 1.08;
+}
+
+.client-rating-copy > p:not(.client-register-kicker) {
+  margin: 18px 0 0;
+  color: #cbd5e1;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.client-rating-reservation {
+  margin-top: 28px;
+  display: grid;
+  gap: 12px;
+}
+
+.client-rating-reservation span {
+  min-height: 46px;
+  padding: 0 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(236, 72, 153, 0.18);
+  border-radius: 12px;
+  background: rgba(8, 13, 24, 0.6);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.client-rating-reservation svg,
+.client-rating-heading svg,
+.client-rating-textarea svg {
+  color: #ff4fa3;
+  filter: drop-shadow(0 0 8px rgba(236, 72, 153, 0.5));
+}
+
+.client-rating-card {
+  margin-bottom: 0;
+  padding: 30px;
+}
+
+.client-rating-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.client-rating-heading h2 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+.client-rating-heading p {
+  margin: 8px 0 0;
+  color: #94a3b8;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.client-rating-stars,
+.client-rating-tags {
+  margin: 0 0 24px;
+  padding: 0;
+  border: 0;
+}
+
+.client-rating-stars legend,
+.client-rating-tags legend {
+  margin-bottom: 12px;
+  color: #ff4fa3;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.client-rating-star-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.client-rating-star-buttons button {
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(236, 72, 153, 0.22);
+  border-radius: 14px;
+  background: rgba(8, 13, 24, 0.66);
+  color: #475569;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.client-rating-star-buttons button:hover,
+.client-rating-star-buttons button.is-active,
+.client-rating-star-buttons button:focus-visible {
+  border-color: rgba(236, 72, 153, 0.62);
+  color: #ff4fa3;
+  box-shadow: 0 0 22px rgba(236, 72, 153, 0.18);
+  transform: translateY(-2px);
+}
+
+.client-rating-star-buttons button.is-active svg {
+  fill: rgba(255, 79, 163, 0.34);
+}
+
+.client-rating-stars strong {
+  display: block;
+  margin-top: 12px;
+  color: #ffffff;
+  font-size: 16px;
+}
+
+.client-rating-tags > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.client-rating-tags button {
+  min-height: 42px;
+  padding: 0 14px;
+  border: 1px solid rgba(236, 72, 153, 0.22);
+  border-radius: 999px;
+  background: rgba(8, 13, 24, 0.62);
+  color: #e2e8f0;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.client-rating-tags button:hover,
+.client-rating-tags button.is-active {
+  border-color: rgba(236, 72, 153, 0.62);
+  background: rgba(236, 72, 153, 0.18);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.client-rating-textarea {
+  position: relative;
+  display: block;
+}
+
+.client-rating-textarea svg {
+  position: absolute;
+  top: 23px;
+  left: 20px;
+  pointer-events: none;
+}
+
+.client-rating-textarea textarea {
+  padding: 20px 18px 18px 64px;
+  min-height: 118px;
+}
+
+.client-rating-actions {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: 0.72fr 1.28fr;
+  gap: 14px;
+}
+
+.client-rating-actions .cancel-reservation-btn,
+.client-rating-actions .save-reservation-btn {
+  width: 100%;
+}
+
+.client-rating-actions .save-reservation-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
 @keyframes register-success-fade {
   from {
     opacity: 0;
@@ -563,6 +775,12 @@
 
 .client-form-group label span {
   color: #ff4fa3;
+}
+
+.client-reservation-helper {
+  color: #a8c2e5;
+  font-size: 13px;
+  line-height: 1.4;
 }
 
 .client-form-group input,
@@ -847,6 +1065,14 @@
   filter: brightness(1.08);
 }
 
+.cancel-reservation-btn:disabled,
+.save-reservation-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+  transform: none;
+  filter: grayscale(0.2);
+}
+
 /* ========================================
    RESPONSIVE
 ======================================== */
@@ -926,7 +1152,17 @@
     gap: 18px;
   }
 
+  .client-rating-shell {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
   .client-register-copy {
+    padding: 24px;
+    text-align: center;
+  }
+
+  .client-rating-copy {
     padding: 24px;
     text-align: center;
   }
@@ -941,6 +1177,14 @@
 
   .client-register-actions {
     grid-template-columns: 1fr;
+  }
+
+  .client-rating-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .client-rating-reservation {
+    justify-items: center;
   }
 
   .client-register-login-callout {
@@ -1082,7 +1326,15 @@
     margin-top: 22px;
   }
 
+  .client-rating-logo {
+    margin-top: 22px;
+  }
+
   .client-register-copy {
+    padding: 20px 14px;
+  }
+
+  .client-rating-copy {
     padding: 20px 14px;
   }
 
@@ -1090,8 +1342,38 @@
     font-size: 26px;
   }
 
+  .client-rating-copy h1 {
+    font-size: 26px;
+  }
+
   .client-register-copy > p:not(.client-register-kicker) {
     font-size: 14px;
+  }
+
+  .client-rating-copy > p:not(.client-register-kicker) {
+    font-size: 14px;
+  }
+
+  .client-rating-card {
+    padding: 20px 14px;
+  }
+
+  .client-rating-heading {
+    text-align: left;
+  }
+
+  .client-rating-star-buttons {
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .client-rating-star-buttons button {
+    width: 46px;
+    height: 46px;
+  }
+
+  .client-rating-tags > div {
+    justify-content: center;
   }
 
   .client-register-check {

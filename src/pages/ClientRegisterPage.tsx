@@ -10,6 +10,7 @@ import {
   ShieldCheck,
   UserRound,
 } from 'lucide-react';
+import { ApiError, api, saveClientSession, type Cliente } from '../services/api';
 import '../styles/reservations.css';
 
 function ClientRegisterPage() {
@@ -26,6 +27,8 @@ function ClientRegisterPage() {
   });
   const [message, setMessage] = useState('');
   const [isRegistered, setIsRegistered] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [registeredClient, setRegisteredClient] = useState<Cliente | null>(null);
 
   const updateField = (field: keyof typeof form, value: string | boolean) => {
     setForm((current) => ({
@@ -35,8 +38,12 @@ function ClientRegisterPage() {
     setMessage('');
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    if (isSubmitting) {
+      return;
+    }
 
     if (
       !form.name ||
@@ -61,8 +68,38 @@ function ClientRegisterPage() {
       return;
     }
 
-    setIsRegistered(true);
-    setMessage('Registro creado correctamente. Ya puedes continuar con tu reserva.');
+    setIsSubmitting(true);
+
+    try {
+      const cliente = await api.registrarCliente({
+        nombre: form.name.trim(),
+        apellido: form.lastName.trim(),
+        telefono: form.phone.trim(),
+        correo: form.email.trim(),
+        fecha_nacimiento: form.birthDate,
+        password: form.password,
+        password_confirmation: form.confirmPassword,
+        mayor_edad_confirmado: form.isAdult,
+      });
+
+      saveClientSession(cliente);
+      setRegisteredClient(cliente);
+      setIsRegistered(true);
+      setMessage('Registro creado correctamente. Ya puedes continuar con tu reserva.');
+    } catch (error) {
+      if (error instanceof ApiError) {
+        const firstValidationError = error.errors
+          ? Object.values(error.errors).flat()[0]
+          : null;
+
+        setMessage(firstValidationError ?? error.message);
+        return;
+      }
+
+      setMessage('No se pudo conectar con Laravel. Revisa que http://127.0.0.1:8000 siga activo.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -236,8 +273,13 @@ function ClientRegisterPage() {
             <button type="button" className="cancel-reservation-btn" onClick={() => navigate('/')}>
               Cancelar
             </button>
-            <button type={isRegistered ? 'button' : 'submit'} className="save-reservation-btn" onClick={isRegistered ? () => navigate('/reservas') : undefined}>
-              {isRegistered ? 'Continuar a reservar' : 'Crear registro'}
+            <button
+              type={isRegistered ? 'button' : 'submit'}
+              className="save-reservation-btn"
+              disabled={isSubmitting}
+              onClick={isRegistered ? () => navigate('/reservas') : undefined}
+            >
+              {isSubmitting ? 'Creando registro...' : isRegistered ? 'Continuar a reservar' : 'Crear registro'}
             </button>
           </div>
 
@@ -265,7 +307,11 @@ function ClientRegisterPage() {
 
             <div className="client-register-success-copy">
               <h3>¡Registro completado!</h3>
-              <p>Tus datos fueron registrados correctamente.</p>
+              <p>
+                {registeredClient
+                  ? `${registeredClient.nombre} ${registeredClient.apellido}, tus datos fueron registrados correctamente.`
+                  : 'Tus datos fueron registrados correctamente.'}
+              </p>
               <strong>Ya puedes continuar con tu reserva.</strong>
             </div>
 

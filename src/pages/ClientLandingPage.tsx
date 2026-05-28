@@ -5,11 +5,14 @@ import {
   CalendarDays,
   Check,
   Clock3,
+  CreditCard,
   LockKeyhole,
+  LogOut,
   Mail,
   Menu,
   Phone,
   ShieldCheck,
+  UserRound,
   X,
 } from 'lucide-react';
 
@@ -17,6 +20,7 @@ import '../styles/clientLanding.css';
 import discretLogo from '../assets/images/logo-discret.png';
 import whatsappIcon from '../assets/images/icono-whatsapp.png';
 import motelLogin from '../assets/images/motel-registro.png';
+import { clearClientSession, getClientSession, type Cliente } from '../services/api';
 
 const menuItems = [
   { label: 'Inicio', href: '#inicio' },
@@ -61,6 +65,8 @@ const plans = [
 function ClientLandingPage() {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [clientSession, setClientSession] = useState<Cliente | null>(() => getClientSession());
+  const [planMessage, setPlanMessage] = useState('');
   const reservationUrl = 'https://latasoft.cl/discret/reservas';
   const reservationQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=12&data=${encodeURIComponent(reservationUrl)}`;
   const whatsappUrl = `https://wa.me/56948882467?text=${encodeURIComponent(
@@ -99,6 +105,18 @@ function ClientLandingPage() {
     revealElements.forEach((element) => observer.observe(element));
 
     return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const syncSession = () => setClientSession(getClientSession());
+
+    window.addEventListener('discret-client-session', syncSession);
+    window.addEventListener('storage', syncSession);
+
+    return () => {
+      window.removeEventListener('discret-client-session', syncSession);
+      window.removeEventListener('storage', syncSession);
+    };
   }, []);
 
   useEffect(() => {
@@ -178,16 +196,26 @@ function ClientLandingPage() {
     navigate('/login');
   };
 
-  const requestPlan = (planName: string) => {
-    const message = encodeURIComponent(
-      `Hola, quiero solicitar el ${planName} de DISCRET.`
-    );
+  const logoutClient = () => {
+    clearClientSession();
+    setClientSession(null);
+    setPlanMessage('Sesión cerrada correctamente.');
+    closeMenu();
+  };
 
-    window.open(
-      `https://wa.me/56948882467?text=${message}`,
-      '_blank',
-      'noopener,noreferrer'
+  const handlePlanPurchase = (planName: string) => {
+    closeMenu();
+
+    if (!clientSession) {
+      setPlanMessage('Inicia sesión para comprar un plan con Mercado Pago.');
+      navigate('/login');
+      return;
+    }
+
+    setPlanMessage(
+      `${clientSession.nombre}, dejé listo el flujo para comprar ${planName} con Mercado Pago.`
     );
+    window.open('https://www.mercadopago.cl/', '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -227,16 +255,28 @@ function ClientLandingPage() {
           </nav>
 
           <div className="client-navbar-actions">
-            <button type="button" className="client-auth-btn" onClick={goToLogin}>
-              Iniciar sesión
-            </button>
-            <button
-              type="button"
-              className="client-auth-btn is-primary"
-              onClick={goToRegister}
-            >
-              Registrarse
-            </button>
+            {clientSession ? (
+              <div className="client-session-pill" aria-label="Sesión de cliente">
+                <UserRound size={18} strokeWidth={2.4} />
+                <span>Hola, {clientSession.nombre}</span>
+                <button type="button" aria-label="Cerrar sesión" onClick={logoutClient}>
+                  <LogOut size={17} strokeWidth={2.4} />
+                </button>
+              </div>
+            ) : (
+              <>
+                <button type="button" className="client-auth-btn" onClick={goToLogin}>
+                  Iniciar sesión
+                </button>
+                <button
+                  type="button"
+                  className="client-auth-btn is-primary"
+                  onClick={goToRegister}
+                >
+                  Registrarse
+                </button>
+              </>
+            )}
             <button
               type="button"
               className="client-menu-btn"
@@ -259,13 +299,27 @@ function ClientLandingPage() {
               </a>
             ))}
 
-            <button type="button" className="client-floating-secondary-btn" onClick={goToLogin}>
-              Iniciar sesión
-            </button>
+            {clientSession ? (
+              <>
+                <div className="client-floating-session">
+                  <UserRound size={18} strokeWidth={2.4} />
+                  <span>Hola, {clientSession.nombre}</span>
+                </div>
+                <button type="button" className="client-floating-secondary-btn" onClick={logoutClient}>
+                  Cerrar sesión
+                </button>
+              </>
+            ) : (
+              <>
+                <button type="button" className="client-floating-secondary-btn" onClick={goToLogin}>
+                  Iniciar sesión
+                </button>
 
-            <button type="button" onClick={goToRegister}>
-              Registrarse
-            </button>
+                <button type="button" onClick={goToRegister}>
+                  Registrarse
+                </button>
+              </>
+            )}
           </div>
         </header>
 
@@ -396,11 +450,11 @@ function ClientLandingPage() {
                 className={`client-plan-card client-reveal ${plan.highlighted ? 'is-featured' : ''}`}
                 role="button"
                 tabIndex={0}
-                onClick={() => requestPlan(plan.name)}
+                onClick={() => handlePlanPurchase(plan.name)}
                 onKeyDown={(event) => {
                   if (event.key === 'Enter' || event.key === ' ') {
                     event.preventDefault();
-                    requestPlan(plan.name);
+                    handlePlanPurchase(plan.name);
                   }
                 }}
               >
@@ -428,11 +482,24 @@ function ClientLandingPage() {
                 </ul>
 
                 <span className="client-plan-btn">
-                  Solicitar plan
+                  {clientSession ? (
+                    <>
+                      <CreditCard size={18} strokeWidth={2.4} />
+                      Comprar con Mercado Pago
+                    </>
+                  ) : (
+                    'Inicia sesión para comprar'
+                  )}
                 </span>
               </article>
             ))}
           </div>
+
+          {planMessage && (
+            <p className="client-plan-session-message" role="status">
+              {planMessage}
+            </p>
+          )}
 
           <p className="client-plan-note">
             *Cada plan es por 1 recinto motelero.
@@ -489,12 +556,23 @@ function ClientLandingPage() {
           <span>© 2026 DISCRET</span>
           <strong>© 2026 Sistema de Reservas para Moteles</strong>
           <div className="client-footer-actions" aria-label="Acceso de usuarios">
-            <button type="button" onClick={goToLogin}>
-              Iniciar sesión
-            </button>
-            <button type="button" className="client-footer-primary-btn" onClick={goToRegister}>
-              Registrarse
-            </button>
+            {clientSession ? (
+              <div className="client-footer-session">
+                <span>Sesión iniciada como {clientSession.nombre}</span>
+                <button type="button" onClick={logoutClient}>
+                  Cerrar sesión
+                </button>
+              </div>
+            ) : (
+              <>
+                <button type="button" onClick={goToLogin}>
+                  Iniciar sesión
+                </button>
+                <button type="button" className="client-footer-primary-btn" onClick={goToRegister}>
+                  Registrarse
+                </button>
+              </>
+            )}
           </div>
         </footer>
 

@@ -409,6 +409,24 @@ form label {
   box-shadow: 0 18px 40px rgba(236, 72, 153, 0.45);
 }
 
+.login-button:disabled {
+  cursor: wait;
+  opacity: 0.72;
+  transform: none;
+}
+
+.login-message {
+  margin: -12px 0 18px;
+  padding: 12px 14px;
+  border: 1px solid rgba(236, 72, 153, 0.32);
+  border-radius: 12px;
+  background: rgba(236, 72, 153, 0.1);
+  color: #ffb3d6;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
 .login-register-callout {
   margin-top: 18px;
   padding: 14px 16px;
@@ -455,6 +473,13 @@ form label {
 .login-footer p:last-child {
   font-size: 12px;
   opacity: 0.8;
+}
+
+.login-admin-hint {
+  color: #ffb3d6;
+  font-size: 12px;
+  font-weight: 800;
+  opacity: 0.92;
 }
 
 .recovery-overlay {

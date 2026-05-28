@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import {
   Bed,
@@ -8,6 +8,7 @@ import {
   Pencil,
   CheckCircle2,
   Clock3,
+  Trash2,
   X,
 } from 'lucide-react';
 
@@ -15,160 +16,158 @@ import AdminBreadcrumb from '../components/AdminBreadcrumb';
 import { AdminSkeleton } from '../components/AdminLoading';
 import AdminToast from '../components/AdminToast';
 import AdminSidebar from '../components/AdminSidebar';
+import {
+  ApiError,
+  api,
+  type EstadoReservaApi,
+  type Habitacion,
+  type Reserva,
+  type TipoPagoReservaApi,
+} from '../services/api';
 
 import '../styles/adminSidebar.css';
 import '../styles/adminReservations.css';
 
-function AdminReservationsPage() {
-  /* ========================================
-      CONTROL VISUALIZACION TABLA
-  ======================================== */
+type ReservationView = {
+  id: number;
+  code: string;
+  client: string;
+  room: string;
+  roomId: number;
+  entry: string;
+  exit: string;
+  status: string;
+  statusApi: EstadoReservaApi;
+  payment: string;
+  paymentApi: TipoPagoReservaApi | null;
+  phone: string;
+  email: string;
+  comment: string;
+};
 
+type ReservationFormState = {
+  client: string;
+  roomId: string;
+  entry: string;
+  exit: string;
+  status: EstadoReservaApi;
+  payment: TipoPagoReservaApi;
+};
+
+const statusLabels: Record<EstadoReservaApi, string> = {
+  pendiente: 'Pendiente',
+  confirmada: 'Confirmada',
+  ocupada: 'Ocupada',
+  finalizada: 'Finalizada',
+  cancelada: 'Cancelada',
+};
+
+const paymentLabels: Record<TipoPagoReservaApi, string> = {
+  efectivo: 'Efectivo',
+  transferencia: 'Transferencia',
+  tarjeta: 'Tarjeta',
+  online: 'Pago digital',
+};
+
+const emptyReservationForm: ReservationFormState = {
+  client: '',
+  roomId: '',
+  entry: '',
+  exit: '',
+  status: 'pendiente',
+  payment: 'efectivo',
+};
+
+const formatDateTime = (value: string) => {
+  if (!value) {
+    return 'Sin fecha';
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat('es-CL', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(date);
+};
+
+const toApiDateTime = (value: string) => value.replace('T', ' ');
+
+const mapReservation = (reservation: Reserva): ReservationView => {
+  const clientFromRelation = reservation.cliente
+    ? `${reservation.cliente.nombre} ${reservation.cliente.apellido}`.trim()
+    : '';
+  const roomNumber = reservation.habitacion?.numero ?? String(reservation.habitacion_id);
+  const roomName = reservation.habitacion?.tipo_habitacion?.nombre
+    ?? reservation.habitacion?.nombre
+    ?? 'Habitación';
+
+  return {
+    id: reservation.id,
+    code: reservation.codigo_reserva,
+    client: reservation.nombre_cliente ?? clientFromRelation ?? 'Cliente sin nombre',
+    room: `${roomName} · Hab. ${roomNumber}`,
+    roomId: reservation.habitacion_id,
+    entry: formatDateTime(reservation.fecha_entrada),
+    exit: formatDateTime(reservation.fecha_salida),
+    status: statusLabels[reservation.estado],
+    statusApi: reservation.estado,
+    payment: reservation.tipo_pago ? paymentLabels[reservation.tipo_pago] : 'Pendiente',
+    paymentApi: reservation.tipo_pago,
+    phone: reservation.telefono_cliente ?? reservation.cliente?.telefono ?? 'Sin teléfono',
+    email: reservation.correo_cliente ?? reservation.cliente?.correo ?? 'Sin correo',
+    comment: reservation.comentario ?? 'Sin comentarios',
+  };
+};
+
+function AdminReservationsPage() {
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState('');
   const [modalMessage, setModalMessage] = useState('');
   const [toastMessage, setToastMessage] = useState('');
-  const isLoading = false;
+  const [isLoading, setIsLoading] = useState(true);
+  const [reservations, setReservations] = useState<Reserva[]>([]);
+  const [rooms, setRooms] = useState<Habitacion[]>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [editingReservation, setEditingReservation] = useState<Reservation | null>(null);
-  const [detailReservation, setDetailReservation] = useState<Reservation | null>(null);
-  const [newReservation, setNewReservation] = useState({
-    client: '',
-    room: '',
-    entry: '',
-    exit: '',
-    status: 'Pendiente',
-    payment: 'Efectivo',
-  });
+  const [editingReservation, setEditingReservation] = useState<ReservationView | null>(null);
+  const [detailReservation, setDetailReservation] = useState<ReservationView | null>(null);
+  const [deleteReservation, setDeleteReservation] = useState<ReservationView | null>(null);
+  const [newReservation, setNewReservation] = useState<ReservationFormState>(emptyReservationForm);
 
-  type Reservation = {
-    id: number;
-    client: string;
-    room: string;
-    entry: string;
-    exit: string;
-    status: string;
-    payment: string;
+  const loadReservations = () => {
+    setIsLoading(true);
+
+    Promise.all([
+      api.listarReservas(),
+      api.listarHabitaciones(),
+    ])
+      .then(([reservationResponse, habitaciones]) => {
+        setReservations(reservationResponse.data);
+        setRooms(habitaciones.filter((habitacion) => habitacion.activa));
+      })
+      .catch(() => {
+        setToastMessage('No se pudieron cargar las reservas desde la base de datos.');
+      })
+      .finally(() => setIsLoading(false));
   };
 
-  /* ========================================
-      DATOS SIMULADOS RESERVAS
-  ======================================== */
+  useEffect(() => {
+    loadReservations();
+  }, []);
 
-  const [reservations, setReservations] = useState<Reservation[]>([
-    {
-      id: 1004,
-      client: 'María López',
-      room: 'Hab. 105',
-      entry: '2024-05-24 16:00',
-      exit: '2024-05-24 18:00',
-      status: 'Confirmada',
-      payment: 'Tarjeta',
-    },
-    {
-      id: 1003,
-      client: 'María López',
-      room: 'Hab. 105',
-      entry: '2024-05-24 16:00',
-      exit: '2024-05-24 18:00',
-      status: 'Ocupada',
-      payment: 'Tarjeta',
-    },
-    {
-      id: 1002,
-      client: 'Carlos R.',
-      room: 'Hab. 107',
-      entry: '2024-05-24 18:00',
-      exit: '2024-05-24 18:00',
-      status: 'Pendiente',
-      payment: 'Tarjeta',
-    },
-    {
-      id: 1001,
-      client: 'María López',
-      room: 'Hab. 102',
-      entry: '2024-05-24 16:00',
-      exit: '2024-05-24 18:00',
-      status: 'Confirmada',
-      payment: 'Tarjeta',
-    },
-    {
-      id: 1000,
-      client: 'Carlos R.',
-      room: 'Hab. 103',
-      entry: '2024-05-24 18:00',
-      exit: '2024-05-24 18:00',
-      status: 'Pendiente',
-      payment: 'Tarjeta',
-    },
-  ]);
+  const reservationViews = useMemo(
+    () => reservations.map(mapReservation),
+    [reservations],
+  );
 
-  const handleCreateReservation = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    const { client, room, entry, exit, status, payment } = newReservation;
-
-    if (!client || !room || !entry || !exit || !status || !payment) {
-      setModalMessage('Completa todos los campos para crear la reserva.');
-      return;
-    }
-
-    setReservations((currentReservations) => [
-      {
-        id: Math.max(...currentReservations.map((reservation) => reservation.id)) + 1,
-        client,
-        room,
-        entry,
-        exit,
-        status,
-        payment,
-      },
-      ...currentReservations,
-    ]);
-
-    setNewReservation({
-      client: '',
-      room: '',
-      entry: '',
-      exit: '',
-      status: 'Pendiente',
-      payment: 'Efectivo',
-    });
-    setModalMessage('');
-    setShowCreateModal(false);
-    setToastMessage(`Reserva ${Math.max(...reservations.map((reservation) => reservation.id)) + 1} creada correctamente.`);
-  };
-
-  const handleUpdateReservation = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    if (!editingReservation) {
-      return;
-    }
-
-    const { client, room, entry, exit, status, payment } = editingReservation;
-
-    if (!client || !room || !entry || !exit || !status || !payment) {
-      setModalMessage('Completa todos los campos para modificar la reserva.');
-      return;
-    }
-
-    setReservations((currentReservations) =>
-      currentReservations.map((reservation) =>
-        reservation.id === editingReservation.id ? editingReservation : reservation
-      )
-    );
-
-    setEditingReservation(null);
-    setModalMessage('');
-    setToastMessage(`Reserva ${editingReservation.id} actualizada correctamente.`);
-  };
-
-  /* ========================================
-      RESERVAS VISIBLES TABLA
-  ======================================== */
-
-  const filteredReservations = reservations.filter((reservation) => {
+  const filteredReservations = reservationViews.filter((reservation) => {
     const normalizedSearch = searchTerm.trim().toLowerCase();
 
     if (!normalizedSearch) {
@@ -176,7 +175,7 @@ function AdminReservationsPage() {
     }
 
     return (
-      String(reservation.id).includes(normalizedSearch)
+      reservation.code.toLowerCase().includes(normalizedSearch)
       || reservation.client.toLowerCase().includes(normalizedSearch)
       || reservation.room.toLowerCase().includes(normalizedSearch)
       || reservation.status.toLowerCase().includes(normalizedSearch)
@@ -185,27 +184,104 @@ function AdminReservationsPage() {
   });
 
   const visibleReservations = filteredReservations.slice(0, itemsPerPage);
-
-  /* ========================================
-      RESERVAS RECIENTES
-  ======================================== */
-
   const recentReservations = filteredReservations.slice(0, 4);
+  const confirmedCount = reservationViews.filter((reservation) => reservation.statusApi === 'confirmada').length;
+  const pendingCount = reservationViews.filter((reservation) => reservation.statusApi === 'pendiente').length;
+
+  const handleCreateReservation = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const { client, roomId, entry, exit, status, payment } = newReservation;
+
+    if (!client || !roomId || !entry || !exit || !status || !payment) {
+      setModalMessage('Completa todos los campos para crear la reserva.');
+      return;
+    }
+
+    try {
+      const createdReservation = await api.crearReserva({
+        habitacion_id: Number(roomId),
+        nombre_cliente: client.trim(),
+        cantidad_personas: 1,
+        fecha_entrada: toApiDateTime(entry),
+        fecha_salida: toApiDateTime(exit),
+        estado: status,
+        tipo_pago: payment,
+      });
+
+      setReservations((currentReservations) => [createdReservation, ...currentReservations]);
+      setNewReservation(emptyReservationForm);
+      setModalMessage('');
+      setShowCreateModal(false);
+      setToastMessage(`Reserva ${createdReservation.codigo_reserva} creada correctamente.`);
+    } catch (error) {
+      const message = error instanceof ApiError
+        ? Object.values(error.errors ?? {}).flat()[0] ?? error.message
+        : 'No se pudo crear la reserva.';
+
+      setModalMessage(message);
+    }
+  };
+
+  const handleUpdateReservation = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!editingReservation) {
+      return;
+    }
+
+    try {
+      const updatedReservation = await api.actualizarReserva(editingReservation.id, {
+        habitacion_id: editingReservation.roomId,
+        nombre_cliente: editingReservation.client,
+        estado: editingReservation.statusApi,
+        tipo_pago: editingReservation.paymentApi ?? 'efectivo',
+      });
+
+      setReservations((currentReservations) =>
+        currentReservations.map((reservation) =>
+          reservation.id === updatedReservation.id ? updatedReservation : reservation
+        )
+      );
+      setEditingReservation(null);
+      setModalMessage('');
+      setToastMessage(`Reserva ${updatedReservation.codigo_reserva} actualizada correctamente.`);
+    } catch (error) {
+      const message = error instanceof ApiError
+        ? Object.values(error.errors ?? {}).flat()[0] ?? error.message
+        : 'No se pudo actualizar la reserva.';
+
+      setModalMessage(message);
+    }
+  };
+
+  const handleDeleteReservation = async () => {
+    if (!deleteReservation) {
+      return;
+    }
+
+    try {
+      await api.eliminarReserva(deleteReservation.id);
+
+      setReservations((currentReservations) =>
+        currentReservations.filter((reservation) => reservation.id !== deleteReservation.id)
+      );
+      setDeleteReservation(null);
+      setToastMessage(`Reserva ${deleteReservation.code} eliminada correctamente.`);
+    } catch (error) {
+      const message = error instanceof ApiError
+        ? error.message
+        : 'No se pudo eliminar la reserva.';
+
+      setToastMessage(message);
+    }
+  };
 
   return (
     <main className="admin-reservations-layout">
-      {/* ========================================
-          SIDEBAR ADMIN REUTILIZABLE
-      ======================================== */}
-
       <AdminSidebar active="reservas" />
 
-      {/* ========================================
-          CONTENIDO PRINCIPAL
-      ======================================== */}
-
       <section className="admin-reservations-main">
-        {/* HEADER */}
         <header className="admin-reservations-header">
           <div>
             <AdminBreadcrumb current="Reservas" />
@@ -213,7 +289,6 @@ function AdminReservationsPage() {
             <p>Historial y nuevas reservas</p>
           </div>
 
-          {/* BUSCADOR + BOTON */}
           <div className="admin-reservations-actions">
             <div className="admin-search">
               <Search size={18} />
@@ -233,140 +308,123 @@ function AdminReservationsPage() {
           </div>
         </header>
 
-        {/* ========================================
-            TARJETAS RESUMEN
-        ======================================== */}
-
         {isLoading ? (
           <AdminSkeleton variant="summary" count={3} label="Cargando resumen de reservas" />
         ) : (
-        <>
-        <section className="admin-reservations-summary">
-          {/* CONFIRMADAS */}
-          <article>
-            <div className="summary-icon green">
-              <CheckCircle2 size={24} strokeWidth={2.4} />
+          <>
+            <section className="admin-reservations-summary">
+              <article>
+                <div className="summary-icon green">
+                  <CheckCircle2 size={24} strokeWidth={2.4} />
+                </div>
+
+                <div>
+                  <strong>{confirmedCount}</strong>
+                  <p>Confirmadas ({confirmedCount})</p>
+                </div>
+              </article>
+
+              <article>
+                <div className="summary-icon yellow">
+                  <Clock3 size={24} strokeWidth={2.4} />
+                </div>
+
+                <div>
+                  <strong>{pendingCount}</strong>
+                  <p>Pendientes ({pendingCount})</p>
+                </div>
+              </article>
+
+              <article>
+                <div className="summary-icon pink">
+                  <Bed size={26} strokeWidth={2.4} />
+                </div>
+
+                <div>
+                  <strong>{reservationViews.length}</strong>
+                  <p>Total Reservas ({reservationViews.length})</p>
+                </div>
+              </article>
+            </section>
+
+            <div className="table-limit-control">
+              <span>Mostrar</span>
+
+              <select
+                value={itemsPerPage}
+                onChange={(event) => setItemsPerPage(Number(event.target.value))}
+              >
+                <option value={5}>5 reservas</option>
+                <option value={10}>10 reservas</option>
+              </select>
             </div>
 
-            <div>
-              <strong>3</strong>
-              <p>Confirmadas (3)</p>
-            </div>
-          </article>
-
-          {/* PENDIENTES */}
-          <article>
-            <div className="summary-icon yellow">
-              <Clock3 size={24} strokeWidth={2.4} />
-            </div>
-
-            <div>
-              <strong>1</strong>
-              <p>Pendientes (1)</p>
-            </div>
-          </article>
-
-          {/* TOTAL */}
-          <article>
-            <div className="summary-icon pink">
-              <Bed size={26} strokeWidth={2.4} />
-            </div>
-
-            <div>
-              <strong>4</strong>
-              <p>Total Reservas (4)</p>
-            </div>
-          </article>
-        </section>
-
-        {/* ========================================
-            CONTROL TABLA
-        ======================================== */}
-
-        <div className="table-limit-control">
-          <span>Mostrar</span>
-
-          <select
-            value={itemsPerPage}
-            onChange={(event) => setItemsPerPage(Number(event.target.value))}
-          >
-            <option value={5}>5 reservas</option>
-            <option value={10}>10 reservas</option>
-          </select>
-        </div>
-
-        {/* ========================================
-            TABLA RESERVAS
-        ======================================== */}
-
-        <section className="admin-reservations-table" aria-busy={isLoading}>
-          <div className="table-header">
-            <span>ID Reserva</span>
-            <span>Cliente</span>
-            <span>Habitación</span>
-            <span>Fecha de Entrada</span>
-            <span>Fecha de Salida</span>
-            <span>Estado</span>
-            <span>Tipo de Pago</span>
-            <span>Acciones</span>
-          </div>
-
-          {isLoading && (
-            <AdminSkeleton variant="table" count={5} label="Cargando reservas" />
-          )}
-
-          {!isLoading && visibleReservations.map((reservation) => (
-            <div className="table-row" key={reservation.id}>
-              <span>{reservation.id}</span>
-              <span>{reservation.client}</span>
-              <span className="room-link">{reservation.room}</span>
-              <span>{reservation.entry}</span>
-              <span>{reservation.exit}</span>
-
-              <span className={`status ${reservation.status.toLowerCase()}`}>
-                {reservation.status}
-              </span>
-
-              <span>{reservation.payment}</span>
-
-              <div className="table-actions">
-                <button type="button" onClick={() => setDetailReservation(reservation)}>
-                  <Eye size={17} />
-                  Detalle
-                </button>
-
-                <button type="button" onClick={() => setEditingReservation(reservation)}>
-                  <Pencil size={17} />
-                  Editar
-                </button>
+            <section className="admin-reservations-table" aria-busy={isLoading}>
+              <div className="table-header">
+                <span>ID Reserva</span>
+                <span>Cliente</span>
+                <span>Habitación</span>
+                <span>Fecha de Entrada</span>
+                <span>Fecha de Salida</span>
+                <span>Estado</span>
+                <span>Tipo de Pago</span>
+                <span>Acciones</span>
               </div>
-            </div>
-          ))}
 
-          {!isLoading && visibleReservations.length === 0 && (
-            <div className="admin-empty-state admin-table-empty">
-              <div>
-                <strong>No hay reservas para mostrar</strong>
-                <p>
-                  Prueba con otro cliente, habitación, estado, tipo de pago o ID de reserva.
-                </p>
-              </div>
-            </div>
-          )}
-        </section>
-        </>
+              {visibleReservations.map((reservation) => (
+                <div className="table-row" key={reservation.id}>
+                  <span>{reservation.code}</span>
+                  <span>{reservation.client}</span>
+                  <span className="room-link">{reservation.room}</span>
+                  <span>{reservation.entry}</span>
+                  <span>{reservation.exit}</span>
+
+                  <span className={`status ${reservation.statusApi}`}>
+                    {reservation.status}
+                  </span>
+
+                  <span>{reservation.payment}</span>
+
+                  <div className="table-actions">
+                    <button type="button" onClick={() => setDetailReservation(reservation)}>
+                      <Eye size={17} />
+                      Detalle
+                    </button>
+
+                    <button type="button" onClick={() => setEditingReservation(reservation)}>
+                      <Pencil size={17} />
+                      Editar
+                    </button>
+
+                    <button type="button" onClick={() => setDeleteReservation(reservation)}>
+                      <Trash2 size={17} />
+                      Eliminar
+                    </button>
+                  </div>
+                </div>
+              ))}
+
+              {visibleReservations.length === 0 && (
+                <div className="admin-empty-state admin-table-empty">
+                  <div>
+                    <strong>No hay reservas para mostrar</strong>
+                    <p>
+                      Cuando un cliente confirme una reserva desde el front,
+                      aparecerá automáticamente en esta tabla.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </section>
+          </>
         )}
-
-        {/* ========================================
-            RESERVAS RECIENTES
-        ======================================== */}
 
         <section className="admin-recent-reservations">
           <div className="recent-header">
             <h2>Reservas recientes</h2>
 
-            <button type="button">
-              Ver todas
+            <button type="button" onClick={loadReservations}>
+              Actualizar
             </button>
           </div>
 
@@ -434,24 +492,27 @@ function AdminReservationsPage() {
                     setNewReservation((reservation) => ({
                       ...reservation,
                       client: event.target.value,
-                    }))
-                  }
+                    }))}
                 />
               </label>
 
               <label>
                 Habitación
-                <input
-                  type="text"
-                  placeholder="Ej: Hab. 105"
-                  value={newReservation.room}
+                <select
+                  value={newReservation.roomId}
                   onChange={(event) =>
                     setNewReservation((reservation) => ({
                       ...reservation,
-                      room: event.target.value,
-                    }))
-                  }
-                />
+                      roomId: event.target.value,
+                    }))}
+                >
+                  <option value="">Selecciona habitación</option>
+                  {rooms.map((room) => (
+                    <option value={room.id} key={room.id}>
+                      Hab. {room.numero} · {room.tipo_habitacion?.nombre ?? room.nombre}
+                    </option>
+                  ))}
+                </select>
               </label>
 
               <label>
@@ -463,8 +524,7 @@ function AdminReservationsPage() {
                     setNewReservation((reservation) => ({
                       ...reservation,
                       entry: event.target.value,
-                    }))
-                  }
+                    }))}
                 />
               </label>
 
@@ -477,8 +537,7 @@ function AdminReservationsPage() {
                     setNewReservation((reservation) => ({
                       ...reservation,
                       exit: event.target.value,
-                    }))
-                  }
+                    }))}
                 />
               </label>
 
@@ -489,13 +548,12 @@ function AdminReservationsPage() {
                   onChange={(event) =>
                     setNewReservation((reservation) => ({
                       ...reservation,
-                      status: event.target.value,
-                    }))
-                  }
+                      status: event.target.value as EstadoReservaApi,
+                    }))}
                 >
-                  <option>Pendiente</option>
-                  <option>Confirmada</option>
-                  <option>Ocupada</option>
+                  {Object.entries(statusLabels).map(([value, label]) => (
+                    <option value={value} key={value}>{label}</option>
+                  ))}
                 </select>
               </label>
 
@@ -506,14 +564,12 @@ function AdminReservationsPage() {
                   onChange={(event) =>
                     setNewReservation((reservation) => ({
                       ...reservation,
-                      payment: event.target.value,
-                    }))
-                  }
+                      payment: event.target.value as TipoPagoReservaApi,
+                    }))}
                 >
-                  <option>Efectivo</option>
-                  <option>Tarjeta</option>
-                  <option>Transferencia</option>
-                  <option>Pago digital</option>
+                  {Object.entries(paymentLabels).map(([value, label]) => (
+                    <option value={value} key={value}>{label}</option>
+                  ))}
                 </select>
               </label>
 
@@ -568,80 +624,41 @@ function AdminReservationsPage() {
                   onChange={(event) =>
                     setEditingReservation((reservation) =>
                       reservation ? { ...reservation, client: event.target.value } : reservation
-                    )
-                  }
-                />
-              </label>
-
-              <label>
-                Habitación
-                <input
-                  type="text"
-                  value={editingReservation.room}
-                  onChange={(event) =>
-                    setEditingReservation((reservation) =>
-                      reservation ? { ...reservation, room: event.target.value } : reservation
-                    )
-                  }
-                />
-              </label>
-
-              <label>
-                Fecha de entrada
-                <input
-                  type="datetime-local"
-                  value={editingReservation.entry}
-                  onChange={(event) =>
-                    setEditingReservation((reservation) =>
-                      reservation ? { ...reservation, entry: event.target.value } : reservation
-                    )
-                  }
-                />
-              </label>
-
-              <label>
-                Fecha de salida
-                <input
-                  type="datetime-local"
-                  value={editingReservation.exit}
-                  onChange={(event) =>
-                    setEditingReservation((reservation) =>
-                      reservation ? { ...reservation, exit: event.target.value } : reservation
-                    )
-                  }
+                    )}
                 />
               </label>
 
               <label>
                 Estado
                 <select
-                  value={editingReservation.status}
+                  value={editingReservation.statusApi}
                   onChange={(event) =>
                     setEditingReservation((reservation) =>
-                      reservation ? { ...reservation, status: event.target.value } : reservation
-                    )
-                  }
+                      reservation
+                        ? { ...reservation, statusApi: event.target.value as EstadoReservaApi }
+                        : reservation
+                    )}
                 >
-                  <option>Pendiente</option>
-                  <option>Confirmada</option>
-                  <option>Ocupada</option>
+                  {Object.entries(statusLabels).map(([value, label]) => (
+                    <option value={value} key={value}>{label}</option>
+                  ))}
                 </select>
               </label>
 
               <label>
                 Tipo de pago
                 <select
-                  value={editingReservation.payment}
+                  value={editingReservation.paymentApi ?? 'efectivo'}
                   onChange={(event) =>
                     setEditingReservation((reservation) =>
-                      reservation ? { ...reservation, payment: event.target.value } : reservation
-                    )
-                  }
+                      reservation
+                        ? { ...reservation, paymentApi: event.target.value as TipoPagoReservaApi }
+                        : reservation
+                    )}
                 >
-                  <option>Efectivo</option>
-                  <option>Tarjeta</option>
-                  <option>Transferencia</option>
-                  <option>Pago digital</option>
+                  {Object.entries(paymentLabels).map(([value, label]) => (
+                    <option value={value} key={value}>{label}</option>
+                  ))}
                 </select>
               </label>
 
@@ -682,12 +699,22 @@ function AdminReservationsPage() {
             <div className="admin-reservation-detail-grid">
               <div>
                 <span>ID Reserva</span>
-                <strong>{detailReservation.id}</strong>
+                <strong>{detailReservation.code}</strong>
               </div>
 
               <div>
                 <span>Cliente</span>
                 <strong>{detailReservation.client}</strong>
+              </div>
+
+              <div>
+                <span>Teléfono</span>
+                <strong>{detailReservation.phone}</strong>
+              </div>
+
+              <div>
+                <span>Correo</span>
+                <strong>{detailReservation.email}</strong>
               </div>
 
               <div>
@@ -714,6 +741,55 @@ function AdminReservationsPage() {
                 <span>Tipo de pago</span>
                 <strong>{detailReservation.payment}</strong>
               </div>
+
+              <div>
+                <span>Comentario</span>
+                <strong>{detailReservation.comment}</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {deleteReservation && (
+        <div className="admin-reservation-modal-overlay">
+          <div className="admin-reservation-modal admin-reservation-delete-modal">
+            <div className="admin-reservation-modal-header">
+              <div>
+                <h2>Eliminar reserva</h2>
+                <p>Esta acción cancelará la reserva en la base de datos.</p>
+              </div>
+
+              <button type="button" onClick={() => setDeleteReservation(null)}>
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="admin-delete-reservation-summary">
+              <div>
+                <span>ID Reserva</span>
+                <strong>{deleteReservation.code}</strong>
+              </div>
+
+              <div>
+                <span>Cliente</span>
+                <strong>{deleteReservation.client}</strong>
+              </div>
+
+              <div>
+                <span>Habitación</span>
+                <strong>{deleteReservation.room}</strong>
+              </div>
+            </div>
+
+            <div className="admin-reservation-modal-actions">
+              <button type="button" onClick={() => setDeleteReservation(null)}>
+                Cancelar
+              </button>
+
+              <button type="button" className="danger" onClick={handleDeleteReservation}>
+                Eliminar reserva
+              </button>
             </div>
           </div>
         </div>

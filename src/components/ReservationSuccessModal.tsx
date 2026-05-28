@@ -7,6 +7,7 @@ type Props = {
   isOpen: boolean;
   reservation: {
     roomType: string;
+    roomNumber?: string;
     date: string;
     selectedHour: string;
   };
@@ -17,6 +18,8 @@ type Props = {
     email: string;
   };
   checkoutHour: string;
+  reservationCode?: string;
+  qrToken?: string;
 };
 
 function ReservationSuccessModal({
@@ -24,6 +27,8 @@ function ReservationSuccessModal({
   reservation,
   client,
   checkoutHour,
+  reservationCode,
+  qrToken,
 }: Props) {
   const navigate = useNavigate();
 
@@ -32,22 +37,27 @@ function ReservationSuccessModal({
   }
 
   const clientFullName = `${client.name} ${client.lastName}`.trim();
-  const reservationId = `DIS-${reservation.date.replace(/\W/g, '').slice(-6)}-${reservation.selectedHour.replace(/\W/g, '')}`;
+  const reservationId = reservationCode
+    ?? `DIS-${reservation.date.replace(/\W/g, '').slice(-6)}-${reservation.selectedHour.replace(/\W/g, '')}`;
+  const roomLabel = reservation.roomNumber
+    ? `${reservation.roomType} · Hab. ${reservation.roomNumber}`
+    : reservation.roomType;
   const accessPayload = [
     'DISCRET - COMPROBANTE DE RESERVA',
     `ID reserva: ${reservationId}`,
+    qrToken ? `Token QR: ${qrToken}` : null,
     `Cliente: ${clientFullName}`,
-    `Habitacion: ${reservation.roomType}`,
+    `Habitación: ${roomLabel}`,
     `Fecha: ${reservation.date}`,
     `Entrada: ${reservation.selectedHour}`,
     `Salida: ${checkoutHour}`,
-    `Telefono: +56 ${client.phone}`,
+    `Teléfono: +56 ${client.phone}`,
     `Correo: ${client.email}`,
-  ].join('\n');
+  ].filter(Boolean).join('\n');
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=14&data=${encodeURIComponent(accessPayload)}`;
   const mailSubject = encodeURIComponent('Comprobante de reserva DISCRET');
   const mailBody = encodeURIComponent(
-    `${accessPayload}\n\nPresenta este comprobante o QR en porteria al momento de ingresar al motel.`
+    `${accessPayload}\n\nPresenta este comprobante o QR en portería al momento de ingresar al motel.`,
   );
   const mailToClient = `mailto:${client.email}?subject=${mailSubject}&body=${mailBody}`;
 
@@ -106,7 +116,7 @@ function ReservationSuccessModal({
 
               <div>
                 <span>Habitación</span>
-                <strong>{reservation.roomType}</strong>
+                <strong>{roomLabel}</strong>
               </div>
 
               <div>

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Bed, Bell, Building2, MessageCircle, ShieldCheck } from 'lucide-react';
+import { Bed, Bell, Building2, MessageCircle, ShieldCheck, Star } from 'lucide-react';
 import AdminBreadcrumb from '../components/AdminBreadcrumb';
 import AdminToast, { type AdminToastType } from '../components/AdminToast';
 import AdminSidebar from '../components/AdminSidebar';
@@ -29,6 +29,12 @@ function SettingsPage() {
     closingTime: '23:59',
     reservationDuration: '3 horas',
     cleaningTime: '30 minutos',
+  });
+  const [ratingSettings, setRatingSettings] = useState({
+    enabled: 'Activo',
+    sendDelay: '30 minutos',
+    channel: 'Correo',
+    message: 'Gracias por visitarnos. Queremos conocer tu experiencia en DISCRET.',
   });
   const [motelData, setMotelData] = useState({
     name: 'Discret',
@@ -89,6 +95,15 @@ function SettingsPage() {
 
   const updateScheduleSetting = (field: keyof typeof scheduleSettings, value: string) => {
     setScheduleSettings((currentSettings) => ({
+      ...currentSettings,
+      [field]: value,
+    }));
+    setSaveMessage('');
+    setSettingsError('');
+  };
+
+  const updateRatingSetting = (field: keyof typeof ratingSettings, value: string) => {
+    setRatingSettings((currentSettings) => ({
       ...currentSettings,
       [field]: value,
     }));
@@ -164,6 +179,12 @@ function SettingsPage() {
       closingTime: '23:59',
       reservationDuration: '3 horas',
       cleaningTime: '30 minutos',
+    });
+    setRatingSettings({
+      enabled: 'Activo',
+      sendDelay: '30 minutos',
+      channel: 'Correo',
+      message: 'Gracias por visitarnos. Queremos conocer tu experiencia en DISCRET.',
     });
     setMotelData({
       name: 'Discret',
@@ -375,6 +396,73 @@ function SettingsPage() {
       uso máximo de {reservationPolicies.maxOccupationTime} y
       {reservationPolicies.timeBetweenReservations} entre reservas.
     </p>
+  </div>
+</article>
+
+{/* Valoraciones */}
+<article className="settings-card">
+  <h2>Valoraciones post-salida</h2>
+  <p>EnvÃ­o automÃ¡tico de encuesta al cliente tras finalizar su estadÃ­a.</p>
+
+  <div className="settings-form">
+    <label>
+      Estado
+      <select
+        value={ratingSettings.enabled}
+        onChange={(event) => updateRatingSetting('enabled', event.target.value)}
+      >
+        <option value="Activo">Activo</option>
+        <option value="Inactivo">Inactivo</option>
+      </select>
+    </label>
+
+    <label>
+      Enviar despuÃ©s de
+      <select
+        value={ratingSettings.sendDelay}
+        onChange={(event) => updateRatingSetting('sendDelay', event.target.value)}
+      >
+        <option value="15 minutos">15 minutos</option>
+        <option value="30 minutos">30 minutos</option>
+        <option value="45 minutos">45 minutos</option>
+        <option value="1 hora">1 hora</option>
+      </select>
+    </label>
+
+    <label>
+      Canal
+      <select
+        value={ratingSettings.channel}
+        onChange={(event) => updateRatingSetting('channel', event.target.value)}
+      >
+        <option value="Correo">Correo</option>
+        <option value="WhatsApp">WhatsApp</option>
+        <option value="Correo y WhatsApp">Correo y WhatsApp</option>
+      </select>
+    </label>
+
+    <label className="full-width">
+      Mensaje de invitaciÃ³n
+      <input
+        type="text"
+        value={ratingSettings.message}
+        onChange={(event) => updateRatingSetting('message', event.target.value)}
+      />
+    </label>
+  </div>
+
+  <div className="settings-rating-preview">
+    <span>
+      <Star size={18} strokeWidth={2.5} />
+    </span>
+    <div>
+      <strong>Regla activa</strong>
+      <p>
+        {ratingSettings.enabled === 'Activo'
+          ? `Enviar valoraciÃ³n por ${ratingSettings.channel.toLowerCase()} ${ratingSettings.sendDelay} despuÃ©s de la salida.`
+          : 'El envÃ­o automÃ¡tico de valoraciones estÃ¡ inactivo.'}
+      </p>
+    </div>
   </div>
 </article>
 

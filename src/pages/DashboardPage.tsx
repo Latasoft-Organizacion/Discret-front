@@ -8,20 +8,50 @@ import {
   Unlock,
   X,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import AdminBreadcrumb from '../components/AdminBreadcrumb';
 import AdminToast from '../components/AdminToast';
 import AdminSidebar from '../components/AdminSidebar';
+import { ApiError, api, type EstadoHabitacionApi, type Habitacion } from '../services/api';
 
 import '../styles/adminSidebar.css';
 import '../styles/dashboard.css';
+
+type DashboardRoom = {
+  id: number;
+  number: number;
+  status: 'Disponible' | 'Ocupada' | 'Limpieza';
+  apiStatus: EstadoHabitacionApi;
+};
+
+const mapDashboardRoomStatus = (status: EstadoHabitacionApi): DashboardRoom['status'] => {
+  if (status === 'ocupada' || status === 'bloqueada') {
+    return 'Ocupada';
+  }
+
+  if (status === 'limpieza' || status === 'mantenimiento') {
+    return 'Limpieza';
+  }
+
+  return 'Disponible';
+};
+
+const mapDashboardRoom = (room: Habitacion): DashboardRoom => ({
+  id: room.id,
+  number: Number(room.numero),
+  status: mapDashboardRoomStatus(room.estado),
+  apiStatus: room.estado,
+});
 
 function DashboardPage() {
   const navigate = useNavigate();
   const [quickReservationMessage, setQuickReservationMessage] = useState('');
   const [quickReservationModalMessage, setQuickReservationModalMessage] = useState('');
+  const [dashboardLoadMessage, setDashboardLoadMessage] = useState('');
+  const [isLoadingRooms, setIsLoadingRooms] = useState(true);
+  const [isSavingRoom, setIsSavingRoom] = useState(false);
   const [showQuickReservationModal, setShowQuickReservationModal] = useState(false);
   const [showBlockRoomModal, setShowBlockRoomModal] = useState(false);
   const [showDailyReportModal, setShowDailyReportModal] = useState(false);
@@ -33,17 +63,58 @@ function DashboardPage() {
     exit: '',
   });
 
-  // Datos simulados de habitaciones
-  const [rooms, setRooms] = useState([
-    { number: 101, status: 'Disponible' },
-    { number: 102, status: 'Ocupada' },
-    { number: 103, status: 'Disponible' },
-    { number: 104, status: 'Ocupada' },
-    { number: 105, status: 'Disponible' },
-    { number: 106, status: 'Disponible' },
-    { number: 107, status: 'Ocupada' },
-    { number: 108, status: 'Disponible' },
-  ]);
+  const [rooms, setRooms] = useState<DashboardRoom[]>([]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadRooms = async () => {
+      setIsLoadingRooms(true);
+      setDashboardLoadMessage('');
+
+      try {
+        const habitaciones = await api.listarHabitaciones();
+
+        if (!isMounted) {
+          return;
+        }
+
+        const mappedRooms = habitaciones.map(mapDashboardRoom);
+        setRooms(mappedRooms);
+
+        const firstRoom = mappedRooms[0];
+
+        if (firstRoom) {
+          const firstRoomNumber = String(firstRoom.number);
+          setSelectedBlockRoom(firstRoomNumber);
+          setQuickReservation((reservation) => ({
+            ...reservation,
+            room: reservation.room || firstRoomNumber,
+          }));
+        }
+      } catch (error) {
+        if (!isMounted) {
+          return;
+        }
+
+        const message = error instanceof ApiError
+          ? error.message
+          : 'No se pudieron cargar las habitaciones desde Laravel.';
+
+        setDashboardLoadMessage(message);
+      } finally {
+        if (isMounted) {
+          setIsLoadingRooms(false);
+        }
+      }
+    };
+
+    loadRooms();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Datos simulados de agenda
   const [agenda, setAgenda] = useState([
@@ -56,71 +127,73 @@ function DashboardPage() {
   const createQuickReservation = () => {
     setQuickReservationModalMessage('');
     setShowQuickReservationModal(true);
-    return;
+  };
 
-    const availableRoom = rooms.find((room) => room.status === 'Disponible')!;
+  const handleBlockRoom = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
 
-    if (!availableRoom) {
-      setQuickReservationMessage('No hay habitaciones disponibles para crear una reserva rápida.');
+    if (isSavingRoom) {
       return;
     }
 
-    const entryDate = new Date();
-    const roundedMinutes = entryDate.getMinutes() <= 30 ? 30 : 60;
-    entryDate.setMinutes(roundedMinutes, 0, 0);
+    const roomToBlock = rooms.find((room) => room.number === Number(selectedBlockRoom));
 
-    const entryHour = entryDate.toLocaleTimeString('es-CL', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    });
+    if (!roomToBlock) {
+      setQuickReservationMessage('Selecciona una habitación válida para bloquear.');
+      return;
+    }
 
-    setAgenda((currentAgenda) => [
-      ...currentAgenda,
-      {
-        hour: entryHour,
-        type: 'Reserva',
-        room: `Hab. ${availableRoom.number}`,
-        client: 'Reserva rápida',
-        status: 'Pendiente',
-      },
-    ]);
+    setIsSavingRoom(true);
 
-    setRooms((currentRooms) =>
-      currentRooms.map((room) =>
-        room.number === availableRoom.number
-          ? { ...room, status: 'Ocupada' }
-          : room
-      )
-    );
+    try {
+      const updatedRoom = await api.actualizarHabitacion(roomToBlock.id, {
+        estado: 'bloqueada',
+      });
 
-    setQuickReservationMessage(
-      `Reserva rápida creada para Hab. ${availableRoom.number} a las ${entryHour}.`
-    );
+      setRooms((currentRooms) =>
+        currentRooms.map((room) =>
+          room.id === roomToBlock.id ? mapDashboardRoom(updatedRoom) : room
+        )
+      );
+
+      setQuickReservationMessage(`Habitación ${selectedBlockRoom} bloqueada correctamente.`);
+      setShowBlockRoomModal(false);
+    } catch (error) {
+      const message = error instanceof ApiError
+        ? Object.values(error.errors ?? {}).flat()[0] ?? error.message
+        : 'No se pudo bloquear la habitación en Laravel.';
+
+      setQuickReservationMessage(message);
+    } finally {
+      setIsSavingRoom(false);
+    }
   };
 
-  const handleBlockRoom = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleCreateQuickReservation = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    setRooms((currentRooms) =>
-      currentRooms.map((room) =>
-        room.number === Number(selectedBlockRoom)
-          ? { ...room, status: 'Ocupada' }
-          : room
-      )
-    );
-
-    setQuickReservationMessage(`Habitación ${selectedBlockRoom} bloqueada correctamente.`);
-    setShowBlockRoomModal(false);
-  };
-
-  const handleCreateQuickReservation = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+    if (isSavingRoom) {
+      return;
+    }
 
     if (!quickReservation.client || !quickReservation.room || !quickReservation.entry || !quickReservation.exit) {
       setQuickReservationModalMessage('Completa cliente, habitación, entrada y salida para crear la reserva rápida.');
       return;
     }
+
+    const selectedRoom = rooms.find((room) => room.number === Number(quickReservation.room));
+
+    if (!selectedRoom) {
+      setQuickReservationModalMessage('Selecciona una habitación válida para crear la reserva.');
+      return;
+    }
+
+    setIsSavingRoom(true);
+
+    try {
+      const updatedRoom = await api.actualizarHabitacion(selectedRoom.id, {
+        estado: 'ocupada',
+      });
 
     setAgenda((currentAgenda) => [
       ...currentAgenda,
@@ -133,25 +206,32 @@ function DashboardPage() {
       },
     ]);
 
-    setRooms((currentRooms) =>
-      currentRooms.map((room) =>
-        room.number === Number(quickReservation.room)
-          ? { ...room, status: 'Ocupada' }
-          : room
-      )
-    );
+      setRooms((currentRooms) =>
+        currentRooms.map((room) =>
+          room.id === selectedRoom.id ? mapDashboardRoom(updatedRoom) : room
+        )
+      );
 
     setQuickReservationMessage(
       `Reserva creada para ${quickReservation.client}, Hab. ${quickReservation.room}, ${quickReservation.entry} - ${quickReservation.exit}.`
     );
     setQuickReservation({
       client: '',
-      room: '101',
+      room: rooms[0] ? String(rooms[0].number) : '',
       entry: '',
       exit: '',
     });
     setQuickReservationModalMessage('');
     setShowQuickReservationModal(false);
+    } catch (error) {
+      const message = error instanceof ApiError
+        ? Object.values(error.errors ?? {}).flat()[0] ?? error.message
+        : 'No se pudo crear la reserva rápida en Laravel.';
+
+      setQuickReservationModalMessage(message);
+    } finally {
+      setIsSavingRoom(false);
+    }
   };
 
   const closeQuickReservationModal = () => {
@@ -211,7 +291,15 @@ function DashboardPage() {
         </section>
 
         <section className="rooms-grid">
-          {rooms.map((room) => (
+          {isLoadingRooms && (
+            <div className="dashboard-inline-state">Cargando habitaciones desde Laravel...</div>
+          )}
+
+          {!isLoadingRooms && dashboardLoadMessage && (
+            <div className="dashboard-inline-state is-error">{dashboardLoadMessage}</div>
+          )}
+
+          {!isLoadingRooms && !dashboardLoadMessage && rooms.map((room) => (
             <article key={room.number} className="room-card">
               <div>
                 <span className="bed-icon">
@@ -305,12 +393,12 @@ function DashboardPage() {
           <h3>Acciones rápidas</h3>
 
           <div>
-            <button type="button" onClick={() => setShowBlockRoomModal(true)}>
+            <button type="button" onClick={() => navigate('/habitaciones')}>
               <Bed size={20} />
               Ver habitaciones
             </button>
 
-            <button type="button" onClick={() => navigate('/habitaciones')}>
+            <button type="button" onClick={() => setShowBlockRoomModal(true)}>
               <Lock size={20} />
               Bloquear habitación
             </button>
@@ -416,8 +504,8 @@ function DashboardPage() {
                   Cancelar
                 </button>
 
-                <button type="submit">
-                  Crear reserva
+                <button type="submit" disabled={isSavingRoom}>
+                  {isSavingRoom ? 'Creando...' : 'Crear reserva'}
                 </button>
               </div>
             </form>
@@ -459,8 +547,8 @@ function DashboardPage() {
                   Cancelar
                 </button>
 
-                <button type="submit">
-                  Bloquear habitación
+                <button type="submit" disabled={isSavingRoom}>
+                  {isSavingRoom ? 'Bloqueando...' : 'Bloquear habitación'}
                 </button>
               </div>
             </form>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import {
   Bed,
@@ -16,11 +16,14 @@ import AdminBreadcrumb from '../components/AdminBreadcrumb';
 import { AdminSkeleton } from '../components/AdminLoading';
 import AdminToast from '../components/AdminToast';
 import AdminSidebar from '../components/AdminSidebar';
+import { ApiError, api, type EstadoHabitacionApi, type Habitacion, type TipoHabitacion } from '../services/api';
 
 import '../styles/adminSidebar.css';
 import '../styles/rooms.css';
 
 type Room = {
+  id?: number;
+  typeId: number;
   number: number;
   type: string;
   status: 'Disponible' | 'Ocupada' | 'Limpieza';
@@ -29,6 +32,52 @@ type Room = {
 
 type RoomFilter = 'Todas' | Room['status'];
 
+const formatCurrency = (value: number) =>
+  new Intl.NumberFormat('es-CL', {
+    style: 'currency',
+    currency: 'CLP',
+    maximumFractionDigits: 0,
+  }).format(value);
+
+const mapRoomStatus = (status: Habitacion['estado']): Room['status'] => {
+  if (status === 'ocupada') {
+    return 'Ocupada';
+  }
+
+  if (status === 'limpieza' || status === 'mantenimiento') {
+    return 'Limpieza';
+  }
+
+  return 'Disponible';
+};
+
+const mapApiRoom = (room: Habitacion): Room => ({
+  id: room.id,
+  typeId: room.tipo_habitacion_id,
+  number: Number(room.numero),
+  type: room.descripcion || room.tipo_habitacion?.nombre || room.nombre,
+  status: mapRoomStatus(room.estado),
+  price: formatCurrency(room.precio),
+});
+
+const mapRoomStatusToApi = (status: Room['status']): EstadoHabitacionApi => {
+  if (status === 'Ocupada') {
+    return 'ocupada';
+  }
+
+  if (status === 'Limpieza') {
+    return 'limpieza';
+  }
+
+  return 'disponible';
+};
+
+const parseCurrency = (value: string) => {
+  const parsedValue = Number(value.replace(/[^\d]/g, ''));
+
+  return Number.isFinite(parsedValue) ? parsedValue : 0;
+};
+
 function RoomsPage() {
   // Estado para mostrar u ocultar el modal
   const [showModal, setShowModal] = useState(false);
@@ -36,24 +85,71 @@ function RoomsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [modalMessage, setModalMessage] = useState('');
   const [toastMessage, setToastMessage] = useState('');
-  const isLoading = false;
+  const [loadMessage, setLoadMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [roomTypes, setRoomTypes] = useState<TipoHabitacion[]>([]);
   const [newRoom, setNewRoom] = useState<Room>({
+    typeId: 1,
     number: 109,
     type: '',
     status: 'Disponible',
     price: '',
   });
   const [editingRoom, setEditingRoom] = useState<Room | null>(null);
-  const [editingRoomNumber, setEditingRoomNumber] = useState<number | null>(null);
   const [detailRoom, setDetailRoom] = useState<Room | null>(null);
 
-  // Datos simulados de habitaciones
-  const [rooms, setRooms] = useState<Room[]>([
-    { number: 101, type: 'Suite estándar', status: 'Disponible', price: '$25.000' },
-    { number: 102, type: 'Suite premium', status: 'Ocupada', price: '$35.000' },
-    { number: 103, type: 'Suite jacuzzi', status: 'Limpieza', price: '$45.000' },
-    { number: 104, type: 'Suite estándar', status: 'Disponible', price: '$25.000' },
-  ]);
+  const [rooms, setRooms] = useState<Room[]>([]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadRooms = async () => {
+      setIsLoading(true);
+      setLoadMessage('');
+
+      try {
+        const [habitaciones, tiposHabitacion] = await Promise.all([
+          api.listarHabitaciones(),
+          api.listarTiposHabitacion(),
+        ]);
+
+        if (!isMounted) {
+          return;
+        }
+
+        setRoomTypes(tiposHabitacion);
+        setRooms(habitaciones.map(mapApiRoom));
+        setNewRoom((room) => ({
+          ...room,
+          typeId: tiposHabitacion[0]?.id ?? room.typeId,
+          number: habitaciones.length
+            ? Math.max(...habitaciones.map((habitacion) => Number(habitacion.numero))) + 1
+            : room.number,
+        }));
+      } catch (error) {
+        if (!isMounted) {
+          return;
+        }
+
+        const message = error instanceof ApiError
+          ? error.message
+          : 'No se pudo conectar con Laravel para cargar las habitaciones.';
+
+        setLoadMessage(message);
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    loadRooms();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const roomFilters: Array<{ label: string; value: RoomFilter }> = [
     { label: 'Todas', value: 'Todas' },
@@ -78,34 +174,60 @@ function RoomsPage() {
   const occupiedRooms = rooms.filter((room) => room.status === 'Ocupada').length;
   const cleaningRooms = rooms.filter((room) => room.status === 'Limpieza').length;
 
-  const handleUpdateRoom = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleUpdateRoom = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!editingRoom) {
+    if (!editingRoom || !editingRoom.id || isSaving) {
       return;
     }
 
-    if (!editingRoom.number || !editingRoom.type || !editingRoom.price || !editingRoom.status) {
+    if (!editingRoom.number || !editingRoom.typeId || !editingRoom.price || !editingRoom.status) {
       setModalMessage('Completa todos los campos de la habitación antes de guardar.');
       return;
     }
 
-    setRooms((currentRooms) =>
-      currentRooms.map((room) =>
-        room.number === editingRoomNumber ? editingRoom : room
-      )
-    );
+    setIsSaving(true);
 
-    setEditingRoom(null);
-    setEditingRoomNumber(null);
-    setModalMessage('');
-    setToastMessage(`Habitación ${editingRoom.number} actualizada correctamente.`);
+    try {
+      const selectedType = roomTypes.find((type) => type.id === editingRoom.typeId);
+      const updatedRoom = await api.actualizarHabitacion(editingRoom.id, {
+        tipo_habitacion_id: editingRoom.typeId,
+        numero: String(editingRoom.number),
+        nombre: `Habitación ${editingRoom.number}`,
+        descripcion: selectedType?.nombre ?? editingRoom.type,
+        precio: parseCurrency(editingRoom.price),
+        estado: mapRoomStatusToApi(editingRoom.status),
+        activa: true,
+      });
+
+      setRooms((currentRooms) =>
+        currentRooms.map((room) =>
+          room.id === editingRoom.id ? mapApiRoom(updatedRoom) : room
+        )
+      );
+
+      setEditingRoom(null);
+      setModalMessage('');
+      setToastMessage(`Habitación ${editingRoom.number} actualizada correctamente.`);
+    } catch (error) {
+      const message = error instanceof ApiError
+        ? Object.values(error.errors ?? {}).flat()[0] ?? error.message
+        : 'No se pudo actualizar la habitación en Laravel.';
+
+      setModalMessage(message);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  const handleCreateRoom = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleCreateRoom = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!newRoom.number || !newRoom.type || !newRoom.price || !newRoom.status) {
+    if (isSaving) {
+      return;
+    }
+
+    if (!newRoom.number || !newRoom.typeId || !newRoom.price || !newRoom.status) {
       setModalMessage('Completa número, tipo, precio y estado para crear la habitación.');
       return;
     }
@@ -115,16 +237,40 @@ function RoomsPage() {
       return;
     }
 
-    setRooms((currentRooms) => [...currentRooms, newRoom]);
-    setNewRoom({
-      number: newRoom.number + 1,
-      type: '',
-      status: 'Disponible',
-      price: '',
-    });
-    setModalMessage('');
-    setShowModal(false);
-    setToastMessage(`Habitación ${newRoom.number} creada correctamente.`);
+    setIsSaving(true);
+
+    try {
+      const selectedType = roomTypes.find((type) => type.id === newRoom.typeId);
+      const createdRoom = await api.crearHabitacion({
+        tipo_habitacion_id: newRoom.typeId,
+        numero: String(newRoom.number),
+        nombre: `Habitación ${newRoom.number}`,
+        descripcion: selectedType?.nombre ?? newRoom.type,
+        precio: parseCurrency(newRoom.price),
+        estado: mapRoomStatusToApi(newRoom.status),
+        activa: true,
+      });
+
+      setRooms((currentRooms) => [...currentRooms, mapApiRoom(createdRoom)]);
+      setNewRoom({
+        typeId: roomTypes[0]?.id ?? newRoom.typeId,
+        number: newRoom.number + 1,
+        type: '',
+        status: 'Disponible',
+        price: '',
+      });
+      setModalMessage('');
+      setShowModal(false);
+      setToastMessage(`Habitación ${newRoom.number} creada correctamente.`);
+    } catch (error) {
+      const message = error instanceof ApiError
+        ? Object.values(error.errors ?? {}).flat()[0] ?? error.message
+        : 'No se pudo crear la habitación en Laravel.';
+
+      setModalMessage(message);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -159,6 +305,15 @@ function RoomsPage() {
             </button>
           </div>
         </header>
+
+        {loadMessage && (
+          <div className="admin-empty-state" role="alert">
+            <div>
+              <strong>No se pudieron cargar las habitaciones</strong>
+              <p>{loadMessage}</p>
+            </div>
+          </div>
+        )}
 
         {/* Resumen rápido superior */}
         {isLoading ? (
@@ -237,7 +392,7 @@ function RoomsPage() {
           {!isLoading && filteredRooms.map((room) => (
             <article
               className={`room-detail-card ${room.status.toLowerCase()}`}
-              key={room.number}
+              key={room.id ?? room.number}
             >
               <div className="room-image">
                 <Bed size={28} />
@@ -258,7 +413,6 @@ function RoomsPage() {
                   type="button"
                   onClick={() => {
                     setEditingRoom(room);
-                    setEditingRoomNumber(room.number);
                   }}
                 >
                   <Pencil size={16} />
@@ -334,14 +488,26 @@ function RoomsPage() {
 
               <label>
                 Tipo habitación
-                <input
-                  type="text"
-                  placeholder="Ej: Suite premium"
-                  value={newRoom.type}
-                  onChange={(event) =>
-                    setNewRoom((room) => ({ ...room, type: event.target.value }))
-                  }
-                />
+                <select
+                  value={newRoom.typeId}
+                  onChange={(event) => {
+                    const typeId = Number(event.target.value);
+                    const selectedType = roomTypes.find((type) => type.id === typeId);
+
+                    setNewRoom((room) => ({
+                      ...room,
+                      typeId,
+                      type: selectedType?.nombre ?? room.type,
+                      price: selectedType ? formatCurrency(selectedType.precio_base) : room.price,
+                    }));
+                  }}
+                >
+                  {roomTypes.map((type) => (
+                    <option key={type.id} value={type.id}>
+                      {type.nombre}
+                    </option>
+                  ))}
+                </select>
               </label>
 
               <label>
@@ -384,8 +550,8 @@ function RoomsPage() {
                   Cancelar
                 </button>
 
-                <button type="submit">
-                  Guardar habitación
+                <button type="submit" disabled={isSaving}>
+                  {isSaving ? 'Guardando...' : 'Guardar habitación'}
                 </button>
               </div>
             </form>
@@ -412,7 +578,6 @@ function RoomsPage() {
                 aria-label="Cerrar modal de edición de habitación"
                 onClick={() => {
                   setEditingRoom(null);
-                  setEditingRoomNumber(null);
                   setModalMessage('');
                 }}
               >
@@ -438,15 +603,30 @@ function RoomsPage() {
 
               <label>
                 Tipo habitación
-                <input
-                  type="text"
-                  value={editingRoom.type}
-                  onChange={(event) =>
+                <select
+                  value={editingRoom.typeId}
+                  onChange={(event) => {
+                    const typeId = Number(event.target.value);
+                    const selectedType = roomTypes.find((type) => type.id === typeId);
+
                     setEditingRoom((room) =>
-                      room ? { ...room, type: event.target.value } : room
-                    )
-                  }
-                />
+                      room
+                        ? {
+                            ...room,
+                            typeId,
+                            type: selectedType?.nombre ?? room.type,
+                            price: selectedType ? formatCurrency(selectedType.precio_base) : room.price,
+                          }
+                        : room
+                    );
+                  }}
+                >
+                  {roomTypes.map((type) => (
+                    <option key={type.id} value={type.id}>
+                      {type.nombre}
+                    </option>
+                  ))}
+                </select>
               </label>
 
               <label>
@@ -485,15 +665,14 @@ function RoomsPage() {
                   type="button"
                   onClick={() => {
                     setEditingRoom(null);
-                    setEditingRoomNumber(null);
                     setModalMessage('');
                   }}
                 >
                   Cancelar
                 </button>
 
-                <button type="submit">
-                  Guardar cambios
+                <button type="submit" disabled={isSaving}>
+                  {isSaving ? 'Guardando...' : 'Guardar cambios'}
                 </button>
               </div>
             </form>

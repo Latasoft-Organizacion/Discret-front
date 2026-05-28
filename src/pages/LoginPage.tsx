@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import '../styles/login.css';
 import motelLogin from '../assets/images/motel-login.png';
 import { Bed, CheckCircle2, Eye, EyeOff, KeyRound, LockKeyhole, Mail, Send, X } from 'lucide-react';
+import { ApiError, api, clearAdminSession, clearClientSession, saveAdminSession, saveClientSession } from '../services/api';
 
 
 function LoginPage() {
@@ -11,6 +12,10 @@ function LoginPage() {
   const [isRecoveryOpen, setIsRecoveryOpen] = useState(false);
   const [recoveryEmail, setRecoveryEmail] = useState('');
   const [recoverySent, setRecoverySent] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loginMessage, setLoginMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const openRecovery = () => {
     setRecoverySent(false);
@@ -31,6 +36,62 @@ function LoginPage() {
     }
 
     setRecoverySent(true);
+  };
+
+  const handleLoginSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (isSubmitting) {
+      return;
+    }
+
+    if (!email.trim() || !password) {
+      setLoginMessage('Ingresa tu correo y contraseña.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    setLoginMessage('');
+
+    const normalizedEmail = email.trim();
+
+    try {
+      const adminResponse = await api.loginAdmin({
+        email: normalizedEmail,
+        password,
+      });
+
+      clearClientSession();
+      saveAdminSession(adminResponse.admin);
+      navigate('/dashboard');
+      return;
+    } catch {
+      // Si no es administrador, intentamos el acceso de cliente con las mismas credenciales.
+    }
+
+    try {
+      const response = await api.loginCliente({
+        correo: normalizedEmail,
+        password,
+      });
+
+      clearAdminSession();
+      saveClientSession(response.cliente);
+      navigate('/');
+    } catch (error) {
+      if (error instanceof ApiError) {
+        const firstValidationError = error.errors
+          ? Object.values(error.errors).flat()[0]
+          : null;
+
+        setLoginMessage(firstValidationError ?? error.message);
+        return;
+      }
+
+      setLoginMessage('No se pudo conectar con Laravel. Revisa que el servidor siga activo.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -57,23 +118,40 @@ function LoginPage() {
             </span>
           </div>
 
-          <form>
-            <label>Correo electrónico</label>
+          <form onSubmit={handleLoginSubmit} noValidate>
+            <label htmlFor="login-email">Correo electrónico</label>
             <div className="input-group">
               <span>
                 <Mail size={18} strokeWidth={2.3} />
               </span>
-              <input type="email" placeholder="correo@ejemplo.com" />
+              <input
+                id="login-email"
+                type="email"
+                placeholder="correo@ejemplo.com"
+                autoComplete="email"
+                value={email}
+                onChange={(event) => {
+                  setEmail(event.target.value);
+                  setLoginMessage('');
+                }}
+              />
             </div>
 
-            <label>Contraseña</label>
+            <label htmlFor="login-password">Contraseña</label>
             <div className="input-group">
               <span>
                 <LockKeyhole size={18} strokeWidth={2.3} />
               </span>
               <input
+                id="login-password"
                 type={showPassword ? 'text' : 'password'}
                 placeholder="••••••••"
+                autoComplete="current-password"
+                value={password}
+                onChange={(event) => {
+                  setPassword(event.target.value);
+                  setLoginMessage('');
+                }}
               />
               <button
                 type="button"
@@ -105,8 +183,14 @@ function LoginPage() {
               </button>
             </div>
 
-            <button type="submit" className="login-button">
-              Iniciar sesión
+            {loginMessage && (
+              <p className="login-message" role="alert">
+                {loginMessage}
+              </p>
+            )}
+
+            <button type="submit" className="login-button" disabled={isSubmitting}>
+              {isSubmitting ? 'Iniciando sesión...' : 'Iniciar sesión'}
             </button>
             <div className="login-register-callout">
               <span>¿No tienes cuenta?</span>
@@ -118,7 +202,8 @@ function LoginPage() {
         </div>
 
         <div className="login-footer">
-          <p>Acceso exclusivo para administradores</p>
+          <p>Acceso seguro para clientes y administradores</p>
+          <p className="login-admin-hint">Admin: correo@ejemplo.com / password</p>
           <p>© 2026 Sistema de Reservas para Moteles</p>
         </div>
       </section>

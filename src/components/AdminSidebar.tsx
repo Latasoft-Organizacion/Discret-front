@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 
 import discretLogo from '../assets/images/logo-discret.png';
+import { clearAdminSession } from '../services/api';
 
 type Props = {
   active: string;
@@ -33,6 +34,11 @@ function AdminSidebar({ active }: Props) {
     if (typeof window !== 'undefined' && window.innerWidth <= 1000) {
       setIsOpen(false);
     }
+  };
+
+  const handleLogout = () => {
+    clearAdminSession();
+    closeOnMobile();
   };
 
   return (
@@ -141,7 +147,7 @@ function AdminSidebar({ active }: Props) {
 
       </nav>
 
-      <Link to="/login" className="admin-logout-link" onClick={closeOnMobile}>
+      <Link to="/login" className="admin-logout-link" onClick={handleLogout}>
         <LogOut size={18} />
         Cerrar sesión
       </Link>

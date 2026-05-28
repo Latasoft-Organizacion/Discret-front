@@ -293,9 +293,10 @@
 
 .table-header,
 .table-row {
-  min-width: 1280px;
+  min-width: 1740px;
+  width: 100%;
   display: grid;
-  grid-template-columns: 110px 150px 140px 190px 190px 140px 130px 230px;
+  grid-template-columns: 140px 170px 190px 190px 190px 140px 130px minmax(420px, 1fr);
   align-items: center;
   gap: 18px;
   padding: 18px 22px;
@@ -345,9 +346,23 @@
   color: #f59e0b;
 }
 
+.status.finalizada {
+  background: rgba(148, 163, 184, 0.14);
+  color: #cbd5e1;
+}
+
+.status.cancelada {
+  background: rgba(239, 68, 68, 0.14);
+  color: #ef4444;
+}
+
 .table-actions {
   display: flex;
-  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-width: 400px;
 }
 
 .table-actions button {
@@ -359,6 +374,18 @@
   display: flex;
   align-items: center;
   gap: 7px;
+  flex: 0 0 auto;
+  white-space: nowrap;
+  border-radius: 10px;
+  padding: 8px 6px;
+}
+
+.table-actions button:hover {
+  background: rgba(236, 72, 153, 0.1);
+}
+
+.table-actions button:last-child {
+  color: #fb7185;
 }
 
 /* SCROLL TABLA */
@@ -568,6 +595,38 @@
   box-shadow: 0 16px 34px rgba(236, 72, 153, 0.24);
 }
 
+.admin-reservation-modal-actions button.danger {
+  background: linear-gradient(135deg, #fb7185, #e11d48);
+  box-shadow: 0 16px 34px rgba(225, 29, 72, 0.24);
+}
+
+.admin-delete-reservation-summary {
+  margin: 22px 0 0;
+  display: grid;
+  gap: 12px;
+}
+
+.admin-delete-reservation-summary div {
+  padding: 14px;
+  border-radius: 12px;
+  background: #0f172a;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.admin-delete-reservation-summary span {
+  display: block;
+  margin-bottom: 6px;
+  color: #ff7fbd;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.admin-delete-reservation-summary strong {
+  color: #ffffff;
+  font-size: 14px;
+}
+
 .admin-reservation-detail-grid {
   margin-top: 22px;
   display: grid;
@@ -636,7 +695,7 @@
 
   .table-header,
   .table-row {
-    min-width: 1280px;
+    min-width: 1740px;
   }
 
   .recent-list article {

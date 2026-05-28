@@ -193,6 +193,42 @@
   box-shadow: 0 14px 28px rgba(236, 72, 153, 0.28);
 }
 
+.client-session-pill {
+  min-height: 46px;
+  padding: 0 8px 0 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(236, 72, 153, 0.42);
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.76);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 900;
+  box-shadow:
+    0 12px 26px rgba(0, 0, 0, 0.22),
+    inset 0 0 18px rgba(236, 72, 153, 0.08);
+}
+
+.client-session-pill svg,
+.client-floating-session svg {
+  color: #ff4fa3;
+  filter: drop-shadow(0 0 8px rgba(236, 72, 153, 0.52));
+}
+
+.client-session-pill button {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(236, 72, 153, 0.28);
+  border-radius: 50%;
+  background: rgba(236, 72, 153, 0.1);
+  color: #ff7fbd;
+  cursor: pointer;
+}
+
 .client-menu-btn {
   width: 48px;
   height: 48px;
@@ -251,6 +287,20 @@
 .client-floating-menu .client-floating-secondary-btn {
   border: 1px solid rgba(236, 72, 153, 0.34);
   background: rgba(15, 23, 42, 0.82);
+}
+
+.client-floating-session {
+  min-height: 46px;
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(236, 72, 153, 0.24);
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.72);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 900;
 }
 
 .client-hero-section,
@@ -825,6 +875,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 10px;
   border: 1px solid rgba(236, 72, 153, 0.42);
   border-radius: 14px;
   background: rgba(236, 72, 153, 0.12);
@@ -833,6 +884,11 @@
   font-weight: 900;
   font-family: inherit;
   transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.client-plan-btn svg {
+  color: #ffffff;
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.28));
 }
 
 .client-plan-card.is-featured .client-plan-btn {
@@ -846,6 +902,18 @@
   color: #ffb3d6;
   font-size: 15px;
   font-weight: 800;
+}
+
+.client-plan-session-message {
+  margin: 18px 0 0;
+  padding: 14px 18px;
+  border: 1px solid rgba(236, 72, 153, 0.28);
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.72);
+  color: #ffb3d6;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.45;
 }
 
 .client-contact-section {
@@ -975,6 +1043,20 @@
   justify-content: flex-end;
 }
 
+.client-footer-session {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.client-footer-session span {
+  color: #cbd5e1;
+  font-size: 12px;
+  font-weight: 800;
+}
+
 .client-whatsapp-float {
   position: fixed;
   right: 26px;
@@ -1040,6 +1122,10 @@
   }
 
   .client-auth-btn {
+    display: none;
+  }
+
+  .client-session-pill {
     display: none;
   }
 
@@ -1290,6 +1376,10 @@
   }
 
   .client-footer-actions {
+    justify-content: center;
+  }
+
+  .client-footer-session {
     justify-content: center;
   }
 
